@@ -1,0 +1,51 @@
+rank,county,state,pop,source,notes
+1,Alpine,CA,1100,Treasurer tax sales,Contact for lists
+2,Sierra,CA,3200,Tax defaults,Simple claims
+3,Modoc,CA,9000,Low liens,Owner priority
+4,Mono,CA,13000,Tax auctions,Collector site
+5,Trinity,CA,16000,Board distributions,Annual
+6,Inyo,CA,17000,PDF lists,Quarterly
+7,Mariposa,CA,18000,Foreclosure,Overages
+8,Colusa,CA,22000,Tax sales,Defaults
+9,Amador,CA,38000,Rural auctions,
+10,Calaveras,CA,45000,Treasurer,Foreclosures
+11,Shasta,CA,175000,Online policy,Easiest rural
+12,Tulare,CA,473000,Mail forms,
+13,Riverside,CA,2400000,Sheriff PDFs,
+14,Fresno,CA,1000000,Tax excess,
+15,Kern,CA,915000,Active sales,
+16,Loving,TX,120,Clerk low-vol,
+17,King,TX,250,Tax claims,
+18,Kenedy,TX,350,Minimal comp,
+19,Arthur,NE,450,Auctions,
+20,Blaine,NE,450,Treasurer,
+21,Petroleum,MT,500,Overages,
+22,McPherson,NE,500,Low scrutiny,
+23,Kalawao,HI,80,Small claims,
+24,Esmeralda,NV,700,Defaults,
+25,Slope,ND,700,Minimal liens,
+26,Harding,NM,600,Auctions,
+27,Catron,NM,3500,Easy process,
+28,McCone,MT,1700,Treasurer,
+29,Baca,CO,3500,Sales,
+30,Fall River,SD,7000,Claims,
+31,Loup,NE,650,Rural,
+32,Hooker,NE,700,Quick wins,
+33,Grant,NE,600,Small,
+34,Costilla,CO,4000,Rural,
+35,Hinsdale,CO,800,Tiny,
+36,Owsley,KY,4000,Appalachia,
+37,McDowell,WV,18000,Small claims,
+38,Piute,UT,1500,Rural,
+39,Daggett,UT,1000,Minimal,
+40,Sublette,WY,9000,Auctions,
+41,Niobrara,WY,2500,Low comp,
+42,Hot Springs,WY,4500,Small,
+43,Custer,ID,5000,Rural,
+44,Thomas,NE,700,NE,
+45,Logan,NE,750,NE,
+46,Garfield,MT,1200,MT,
+47,Wibaux,MT,1000,MT,
+48,Powder River,MT,1700,Rural MT,
+49,Dickenson,VA,14000,VA small,
+50,Highland,VA,2200,VA rural,
