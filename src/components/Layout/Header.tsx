@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { Search, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
+import { Search, LayoutDashboard, Settings, LogOut, LogIn, Shield, CreditCard } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
@@ -37,8 +37,24 @@ export default function Header() {
             <span className="hidden sm:block">Directory</span>
           </Link>
 
+          <Link
+            href="/pricing"
+            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+          >
+            <CreditCard className="h-4 w-4" />
+            <span className="hidden sm:block">Pricing</span>
+          </Link>
+
           {session ? (
             <>
+              <Link
+                href="/osint"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-green-600 hover:bg-green-50 hover:text-green-700"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:block">OSINT</span>
+              </Link>
+
               <Link
                 href="/dashboard"
                 className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
