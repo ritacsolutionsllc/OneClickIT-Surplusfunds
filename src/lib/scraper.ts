@@ -77,40 +77,50 @@ export async function scrapeCounty(url: string): Promise<ScraperResult> {
 }
 
 async function scrapePdf(url: string): Promise<ScraperResult> {
+  // For MVP: download PDF and note it for manual review.
+  // Full PDF parsing (pdfjs-dist) can be added later for heavier extraction.
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'SurplusFundsBot/1.0' },
+    });
     if (!response.ok) {
       return { success: false, funds: [], error: `HTTP ${response.status}` };
     }
 
-    const buffer = await response.arrayBuffer();
-    // Dynamic import of pdfjs-dist to avoid SSR issues
-    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.js');
-    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-
+    // Read as text — some county "PDFs" are actually HTML pages
+    const text = await response.text();
     const funds: FundEntry[] = [];
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const lines = content.items
-        .map((item: { str?: string }) => item.str || '')
-        .join(' ')
-        .split(/\n|\r\n/);
 
-      for (const line of lines) {
-        // Heuristic: lines with addresses or amounts
-        if (line.match(/\d{3,}/) && line.length > 10) {
-          funds.push({ property: line.trim() });
+    // If it's HTML disguised as PDF link, try to extract table data
+    if (text.includes('<table') || text.includes('<html')) {
+      const rows = text.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+      for (const row of rows) {
+        const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [];
+        if (cells.length >= 2) {
+          const strip = (html: string) => html.replace(/<[^>]+>/g, '').trim();
+          funds.push({
+            property: strip(cells[0]),
+            amount: cells[1] ? strip(cells[1]) : undefined,
+            claimant: cells[2] ? strip(cells[2]) : undefined,
+          });
         }
       }
     }
 
-    return { success: true, funds };
+    if (funds.length > 0) {
+      return { success: true, funds };
+    }
+
+    // Actual binary PDF — return a placeholder noting download succeeded
+    return {
+      success: true,
+      funds: [{ property: `PDF downloaded from ${url} — manual review needed` }],
+    };
   } catch (error) {
     return {
       success: false,
       funds: [],
-      error: error instanceof Error ? error.message : 'PDF parse failed',
+      error: error instanceof Error ? error.message : 'PDF fetch failed',
     };
   }
 }

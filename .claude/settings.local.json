@@ -3,7 +3,15 @@
     "allow": [
       "Bash(git remote:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(vercel env:*)",
+      "Bash(vercel link:*)",
+      "Bash(openssl rand:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsx:*)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel --prod --yes)"
     ]
   }
 }
