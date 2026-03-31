@@ -1,5 +1,4 @@
 'use client';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { Upload, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';

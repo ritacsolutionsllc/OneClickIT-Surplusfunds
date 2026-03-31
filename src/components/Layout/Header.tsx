@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { MapPin, Search, Bell, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
+import { MapPin, Search, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
