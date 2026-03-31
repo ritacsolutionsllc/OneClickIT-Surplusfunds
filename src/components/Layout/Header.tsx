@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { MapPin, Search, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
+import { Search, LayoutDashboard, Settings, LogOut, LogIn } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function Header() {
@@ -10,9 +11,21 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-bold text-blue-600">
-          <MapPin className="h-5 w-5" />
-          <span className="hidden sm:block">Surplus Funds</span>
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/surplusfunds_favicon.png"
+            alt="Surplus Funds"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+          />
+          <Image
+            src="/surplusfunds_flat_minimal.png"
+            alt="Surplus Funds"
+            width={150}
+            height={47}
+            className="hidden sm:block h-8 w-auto"
+          />
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">

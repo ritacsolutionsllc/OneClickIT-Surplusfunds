@@ -15,9 +15,28 @@ interface CountyRow {
 }
 
 // Known list URLs for counties with confirmed online lists
+// Last researched: 2026-03-31
 const KNOWN_URLS: Record<string, string> = {
+  // --- California Counties ---
+  'Alpine-CA': 'https://alpinecountyca.gov/353/Treasurer-Tax-Collector',
+  'Sierra-CA': 'https://www.sierracounty.ca.gov/314/Property-Tax-Sales',
+  'Modoc-CA': 'https://www.co.modoc.ca.us/departments/tax_collector/publications.php',
+  'Mono-CA': 'https://monocounty.ca.gov/tax/page/property-tax-auction-excess-proceeds',
+  'Trinity-CA': 'https://www.trinitycounty.org/438/Treasurer-Tax-Collector',
   'Inyo-CA': 'https://inyocounty.us/sites/default/files/Excess%20Proceeds%20Publication.pdf',
-  'Riverside-CA': 'https://www.rscso.com/sites/default/files/uploads/Riverside-Dept/Sheriff/Unclaimed-Property.pdf',
+  'Mariposa-CA': 'https://www.mariposacounty.gov/1748/Publications',
+  'Colusa-CA': 'https://www.countyofcolusaca.gov/753/Sale-of-Tax-Defaulted-Property',
+  'Amador-CA': 'https://www.amadorcounty.gov/government/treasurer-tax-collector/publications',
+  'Calaveras-CA': 'https://taxcollector.calaverasgov.us/Auctions',
+  'Shasta-CA': 'https://www.shastacounty.gov/tax-collector/page/excess-proceeds',
+  'Tulare-CA': 'https://tularecounty.ca.gov/treasurertaxcollector/tax-collector/tax-auction',
+  'Riverside-CA': 'https://countytreasurer.org/tax-collector/tax-sale-information',
+  'Fresno-CA': 'https://www.fresnocountyca.gov/Departments/Auditor-Controller-Treasurer-Tax-Collector/Property-Tax-Information/Tax-Sale-Excess-Proceeds',
+  'Kern-CA': 'https://www.kerncounty.com/services/property-land-and-taxes/property-tax-portal/tax-defaulted-property-sales',
+  // --- Non-CA Counties ---
+  'Loving-TX': 'https://www.claimittexas.gov/', // Pop ~120; no county website; use TX state unclaimed property
+  'Sumter-FL': 'https://www.sumterclerk.com/surplus-funds-list',
+  'Carroll-MD': 'https://www.carrollcountymd.gov/government/directory/comptroller/collectionstaxes/surplus-funds-list/',
 };
 
 async function main() {

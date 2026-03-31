@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { MapPin, ArrowRight, Building2 } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Building2 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import CountyCard from '@/components/county/CountyCard';
 import SearchBar from '@/components/search/SearchBar';
@@ -30,8 +31,10 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 px-4 py-16 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-6">
+            <Image src="/surplusfunds_favicon.png" alt="Surplus Funds" width={64} height={64} className="mx-auto h-16 w-16" />
+          </div>
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-500/30 px-3 py-1 text-sm text-blue-100">
-            <MapPin className="h-3.5 w-3.5" />
             {stats.totalCounties} counties across {stats.stateCount} states
           </div>
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-5xl">

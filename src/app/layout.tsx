@@ -13,6 +13,10 @@ export const metadata: Metadata = {
   description:
     'Search publicly available surplus funds lists from rural US counties. Find unclaimed property overages, tax sale proceeds, and foreclosure surpluses.',
   keywords: 'surplus funds, unclaimed property, tax sale proceeds, excess proceeds, county directory',
+  icons: {
+    icon: '/surplusfunds_favicon.png',
+    apple: '/surplusfunds_favicon.png',
+  },
   openGraph: {
     title: 'Surplus Funds Directory',
     description: 'Find surplus funds from rural US county public records',
