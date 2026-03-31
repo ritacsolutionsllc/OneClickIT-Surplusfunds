@@ -38,7 +38,7 @@ export default async function CountyDetailPage({ params }: PageProps) {
   if (!county) notFound();
 
   const latestFunds = county.fundsLists[0];
-  const fundsData = (latestFunds?.fundsData as FundEntry[]) || [];
+  const fundsData = (latestFunds?.fundsData as unknown as FundEntry[]) || [];
   const scrapeStatus = latestFunds?.status;
 
   const statusVariant =

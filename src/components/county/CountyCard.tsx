@@ -37,7 +37,6 @@ export default function CountyCard({ county }: { county: County }) {
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-blue-600 hover:underline"
-            onClick={e => e.stopPropagation()}
           >
             <ExternalLink className="h-3.5 w-3.5" />
             List

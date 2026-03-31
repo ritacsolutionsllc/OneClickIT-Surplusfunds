@@ -12,7 +12,9 @@
       "Bash(npx tsx:*)",
       "Bash(vercel ls:*)",
       "Bash(vercel --prod --yes)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

@@ -59,7 +59,7 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
       </div>
 
       <div className="mb-6">
-        <Suspense>
+        <Suspense fallback={<div />}>
           <CountyFilters />
         </Suspense>
       </div>

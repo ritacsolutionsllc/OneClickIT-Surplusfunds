@@ -14,7 +14,8 @@ export interface ScraperResult {
 export async function scrapeCounty(url: string): Promise<ScraperResult> {
   // Dynamic imports to avoid bundling issues in Next.js
   let puppeteer: typeof import('puppeteer-core');
-  let chromium: typeof import('@sparticuz/chromium').default;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let chromium: any;
 
   try {
     puppeteer = await import('puppeteer-core');
@@ -98,8 +99,9 @@ async function scrapePdf(url: string): Promise<ScraperResult> {
         const cells = row.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [];
         if (cells.length >= 2) {
           const strip = (html: string) => html.replace(/<[^>]+>/g, '').trim();
+          const prop = cells[0] ? strip(cells[0]) : '';
           funds.push({
-            property: strip(cells[0]),
+            property: prop,
             amount: cells[1] ? strip(cells[1]) : undefined,
             claimant: cells[2] ? strip(cells[2]) : undefined,
           });
