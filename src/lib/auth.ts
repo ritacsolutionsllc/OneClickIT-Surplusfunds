@@ -12,39 +12,47 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    EmailProvider({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-    }),
+    ...(process.env.EMAIL_SERVER
+      ? [
+          EmailProvider({
+            server: process.env.EMAIL_SERVER,
+            from: process.env.EMAIL_FROM,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async session({ session, user }) {
-      if (session.user) {
+      if (session.user && user) {
         session.user.id = user.id;
-        const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-        session.user.role = dbUser?.role ?? 'user';
+        // user object from database adapter already has all fields
+        session.user.role = (user as { role?: string }).role ?? 'user';
       }
       return session;
     },
-    async signIn({ user }) {
-      // Auto-elevate admin emails
-      if (user.email && ADMIN_EMAILS.includes(user.email)) {
-        await prisma.user.upsert({
-          where: { email: user.email },
-          update: { role: 'admin' },
-          create: { email: user.email, name: user.name, role: 'admin' },
-        });
+    async signIn({ user, account }) {
+      if (!user.email) return true;
+      // Auto-elevate admin emails on sign-in
+      if (ADMIN_EMAILS.includes(user.email)) {
+        try {
+          await prisma.user.update({
+            where: { email: user.email },
+            data: { role: 'admin' },
+          });
+        } catch {
+          // User might not exist yet on first sign-in; adapter creates them
+        }
       }
       return true;
     },
   },
   pages: {
     signIn: '/auth/signin',
-    error: '/auth/error',
   },
   session: {
     strategy: 'database',
   },
+  debug: process.env.NODE_ENV === 'development',
 };
 
 declare module 'next-auth' {
