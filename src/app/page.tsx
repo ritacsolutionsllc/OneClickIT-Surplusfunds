@@ -2,23 +2,24 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Building2 } from 'lucide-react';
+import { ArrowRight, Building2, UserPlus, Search, FileText, Shield, DollarSign, Clock, Scale, Send } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import CountyCard from '@/components/county/CountyCard';
 import SearchBar from '@/components/search/SearchBar';
 
 async function getStats() {
-  const [totalCounties, stateCount] = await Promise.all([
+  const [totalCounties, stateGroups, withUrls] = await Promise.all([
     prisma.county.count(),
     prisma.county.groupBy({ by: ['state'] }).then(r => r.length),
+    prisma.county.count({ where: { listUrl: { not: null } } }),
   ]);
-  return { totalCounties, stateCount };
+  return { totalCounties, stateCount: stateGroups, withUrls };
 }
 
 async function getFeaturedCounties() {
   return prisma.county.findMany({
     where: { listUrl: { not: null } },
-    orderBy: { rank: 'asc' },
+    orderBy: [{ population: 'desc' }],
     take: 6,
   });
 }
@@ -41,10 +42,10 @@ export default async function HomePage() {
             <Image src="/surplusfunds_favicon.png" alt="Surplus Funds" width={64} height={64} className="mx-auto h-16 w-16" />
           </div>
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-500/30 px-3 py-1 text-sm text-blue-100">
-            {stats.totalCounties} counties across {stats.stateCount} states
+            {stats.withUrls} counties with online lists across {stats.stateCount} states
           </div>
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-5xl">
-            Find Surplus Funds<br />from Rural US Counties
+            Find Surplus Funds<br />from US Counties
           </h1>
           <p className="mb-8 text-lg text-blue-100">
             Search publicly available tax sale proceeds, foreclosure overages, and unclaimed
@@ -54,7 +55,7 @@ export default async function HomePage() {
             <SearchBar size="large" />
           </div>
           <div className="mt-4 flex justify-center gap-4 text-sm text-blue-200">
-            <span>Try: Alpine CA · Inyo CA · Loving TX</span>
+            <span>Try: Los Angeles · Sacramento · Maricopa AZ · DeKalb GA</span>
           </div>
         </div>
       </section>
@@ -72,13 +73,142 @@ export default async function HomePage() {
               <div className="text-gray-500">States covered</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-600">Weekly</div>
-              <div className="text-gray-500">Auto-updated</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.withUrls}</div>
+              <div className="text-gray-500">Online lists</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-blue-600">Free</div>
-              <div className="text-gray-500">Public data only</div>
+              <div className="text-gray-500">Public data</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How to Claim Surplus Funds — 8 steps */}
+      <section className="bg-gray-50 border-b border-gray-200 px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">How to Claim Surplus Funds</h2>
+            <p className="mt-2 text-gray-500">The complete process from finding funds to getting paid</p>
+          </div>
+
+          {/* Timeline */}
+          <div className="relative">
+            {/* Vertical line (hidden on mobile) */}
+            <div className="absolute left-6 top-0 bottom-0 hidden w-0.5 bg-gray-200 sm:block" />
+
+            <div className="space-y-6">
+              {[
+                {
+                  step: 1,
+                  icon: <UserPlus className="h-5 w-5" />,
+                  color: 'blue',
+                  title: 'Create Your Free Account',
+                  desc: 'Sign up in seconds with Google. No credit card required. Get instant access to our county directory.',
+                  tag: 'Get started',
+                },
+                {
+                  step: 2,
+                  icon: <Search className="h-5 w-5" />,
+                  color: 'blue',
+                  title: 'Search the County Directory',
+                  desc: `Browse ${stats.totalCounties} counties across ${stats.stateCount} states. Filter by state, population, or keyword to find counties with active surplus funds lists.`,
+                  tag: 'Research',
+                },
+                {
+                  step: 3,
+                  icon: <FileText className="h-5 w-5" />,
+                  color: 'green',
+                  title: 'Review Surplus Funds Lists',
+                  desc: 'Access direct links to official county surplus funds pages. Review property details, amounts, former owner names, and parcel numbers.',
+                  tag: 'Research',
+                },
+                {
+                  step: 4,
+                  icon: <Clock className="h-5 w-5" />,
+                  color: 'green',
+                  title: 'Check Deadlines & Eligibility',
+                  desc: 'Each county listing shows the applicable state statute (e.g., CA Rev & Tax Code §4675) and claim deadline. Verify you are within the filing window — typically 1 year for CA, 2 years for TX, 120 days for FL.',
+                  tag: 'Due diligence',
+                },
+                {
+                  step: 5,
+                  icon: <Shield className="h-5 w-5" />,
+                  color: 'purple',
+                  title: 'Identify the Rightful Claimant',
+                  desc: 'Use our Pro OSINT tools to locate the former property owner or their heirs. Verify addresses, phone numbers, and public records to confirm identity and establish contact.',
+                  tag: 'Pro feature',
+                },
+                {
+                  step: 6,
+                  icon: <Scale className="h-5 w-5" />,
+                  color: 'purple',
+                  title: 'Prepare Your Claim Package',
+                  desc: 'Download the county claim form (linked from our directory). Gather required documents: proof of identity, recorded deed, assignment of rights (if filing on behalf of owner), and any county-specific forms.',
+                  tag: 'Documentation',
+                },
+                {
+                  step: 7,
+                  icon: <Send className="h-5 w-5" />,
+                  color: 'orange',
+                  title: 'File the Claim with the County',
+                  desc: 'Submit your completed claim package to the county Treasurer-Tax Collector (CA), District Clerk (TX), Clerk of Court (FL), or relevant office. Some counties accept mail; others require in-person filing.',
+                  tag: 'Action',
+                },
+                {
+                  step: 8,
+                  icon: <DollarSign className="h-5 w-5" />,
+                  color: 'green',
+                  title: 'Receive Your Funds',
+                  desc: 'After review (typically 30-90 days), the county distributes funds to approved claimants. In CA, the Board of Supervisors must approve. Some counties have a 90-day dispute period before payment.',
+                  tag: 'Payout',
+                },
+              ].map((item) => {
+                const colors: Record<string, { bg: string; text: string; ring: string; tagBg: string; tagText: string }> = {
+                  blue:   { bg: 'bg-blue-100',   text: 'text-blue-600',   ring: 'ring-blue-600',   tagBg: 'bg-blue-50',   tagText: 'text-blue-700' },
+                  green:  { bg: 'bg-green-100',  text: 'text-green-600',  ring: 'ring-green-600',  tagBg: 'bg-green-50',  tagText: 'text-green-700' },
+                  purple: { bg: 'bg-purple-100', text: 'text-purple-600', ring: 'ring-purple-600', tagBg: 'bg-purple-50', tagText: 'text-purple-700' },
+                  orange: { bg: 'bg-orange-100', text: 'text-orange-600', ring: 'ring-orange-600', tagBg: 'bg-orange-50', tagText: 'text-orange-700' },
+                };
+                const c = colors[item.color];
+                return (
+                  <div key={item.step} className="relative flex gap-4 sm:gap-6">
+                    {/* Step number circle */}
+                    <div className={`relative z-10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full ${c.bg} ${c.text} ring-4 ring-white`}>
+                      {item.icon}
+                    </div>
+                    {/* Content */}
+                    <div className="flex-1 rounded-xl bg-white border border-gray-100 p-5 shadow-sm">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="text-xs font-bold text-gray-400">STEP {item.step}</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${c.tagBg} ${c.tagText}`}>
+                          {item.tag}
+                        </span>
+                      </div>
+                      <h3 className="mb-1 font-semibold text-gray-900">{item.title}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-medium text-white hover:bg-green-700"
+            >
+              <UserPlus className="h-4 w-4" />
+              Start claiming — create free account
+            </Link>
+            <Link
+              href="/directory"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <Search className="h-4 w-4" />
+              Browse county directory
+            </Link>
           </div>
         </div>
       </section>
@@ -108,7 +238,7 @@ export default async function HomePage() {
           <div className="rounded-xl border border-dashed border-gray-300 p-12 text-center">
             <Building2 className="mx-auto mb-3 h-8 w-8 text-gray-300" />
             <p className="text-sm text-gray-500">
-              Counties are being seeded. Run <code className="rounded bg-gray-100 px-1">npm run db:seed</code> to populate.
+              Counties are being loaded. Check back shortly.
             </p>
           </div>
         )}

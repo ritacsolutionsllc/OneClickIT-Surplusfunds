@@ -6,11 +6,12 @@ import Button from '@/components/ui/Button';
 import Link from 'next/link';
 
 const BENEFITS = [
-  'Browse 50+ county surplus funds lists',
+  'Browse 90+ county surplus funds lists across 10 states',
   'Search by state, population, and keywords',
-  'View claim rules and deadlines per county',
+  'Direct links to official county surplus funds pages',
+  'View claim rules, deadlines, and statutes per county',
   'Save counties and set up alerts',
-  'Upgrade to Pro for OSINT tools and exports',
+  'Upgrade to Pro for OSINT tools, CSV exports, and more',
 ];
 
 export default function SignUpPage() {

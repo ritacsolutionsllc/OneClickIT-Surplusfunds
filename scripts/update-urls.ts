@@ -952,7 +952,8 @@ async function main() {
     states.set(c.state, (states.get(c.state) || 0) + 1);
   }
   console.log('\nBy state:');
-  for (const [state, count] of [...states.entries()].sort((a, b) => b[1] - a[1])) {
+  const entries = Array.from(states.entries()).sort((a, b) => b[1] - a[1]);
+  for (const [state, count] of entries) {
     console.log(`  ${state}: ${count} counties`);
   }
 }
