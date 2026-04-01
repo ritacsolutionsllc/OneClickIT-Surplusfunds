@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { Search, LayoutDashboard, Settings, LogOut, LogIn, Shield, CreditCard, Wrench, ClipboardList } from 'lucide-react';
+import { Search, LayoutDashboard, Settings, LogOut, LogIn, Shield, Wrench, ClipboardList, BookOpen } from 'lucide-react';
 
 export default function Header() {
   const { data: session } = useSession();
@@ -61,11 +61,11 @@ export default function Header() {
           </Link>
 
           <Link
-            href="/pricing"
+            href="/learn"
             className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
           >
-            <CreditCard className="h-4 w-4" />
-            <span className="hidden sm:block">Pricing</span>
+            <BookOpen className="h-4 w-4" />
+            <span className="hidden sm:block">Learn</span>
           </Link>
 
           {session ? (

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileText, Calculator, Scale, ClipboardList, Shield, Download, Search } from 'lucide-react';
+import { FileText, Calculator, Scale, ClipboardList, Shield, Download, Search, BookOpen, Globe } from 'lucide-react';
 
 const tools = [
   {
@@ -42,6 +42,20 @@ const tools = [
     desc: 'Browse all counties with surplus funds lists, sources, and claim deadlines.',
     href: '/directory',
     icon: Search,
+    color: 'blue',
+  },
+  {
+    name: 'Google Dork Search',
+    desc: 'Generate targeted Google searches to find surplus funds lists by state.',
+    href: '/dorks',
+    icon: Globe,
+    color: 'orange',
+  },
+  {
+    name: 'Learning Center',
+    desc: 'Complete 7-module syllabus on surplus funds recovery — from basics to business.',
+    href: '/learn',
+    icon: BookOpen,
     color: 'blue',
   },
   {
