@@ -1,8 +1,21 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Users } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import CountyFilters from '@/components/county/CountyFilters';
+
+export const metadata: Metadata = {
+  title: 'County Directory',
+  description:
+    'Browse surplus funds lists from hundreds of US counties. Filter by state, search by county name, and access direct links to official public records.',
+  alternates: { canonical: '/directory' },
+  openGraph: {
+    title: 'County Surplus Funds Directory | SurplusClickIT',
+    description: 'Browse surplus funds lists from hundreds of US counties.',
+    url: 'https://surplusclickit.com/directory',
+  },
+};
 import Badge from '@/components/ui/Badge';
 
 interface PageProps {

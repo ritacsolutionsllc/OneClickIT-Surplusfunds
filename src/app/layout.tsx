@@ -9,18 +9,67 @@ import { Analytics } from '@vercel/analytics/react';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Surplus Funds Directory | OneClickIT',
+  title: {
+    default: 'SurplusClickIT — Surplus Funds Directory',
+    template: '%s | SurplusClickIT',
+  },
   description:
-    'Search publicly available surplus funds lists from rural US counties. Find unclaimed property overages, tax sale proceeds, and foreclosure surpluses.',
-  keywords: 'surplus funds, unclaimed property, tax sale proceeds, excess proceeds, county directory',
+    'Search publicly available surplus funds lists from US counties. Find unclaimed property overages, tax sale proceeds, and foreclosure surplus funds — all in one place.',
+  keywords: [
+    'surplus funds',
+    'unclaimed property',
+    'tax sale proceeds',
+    'excess proceeds',
+    'foreclosure surplus',
+    'county surplus funds',
+    'overage funds',
+    'asset recovery',
+    'surplus funds directory',
+    'tax deed surplus',
+  ],
+  authors: [{ name: 'SurplusClickIT', url: 'https://surplusclickit.com' }],
+  creator: 'SurplusClickIT',
+  publisher: 'SurplusClickIT',
+  metadataBase: new URL('https://surplusclickit.com'),
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+    },
+  },
   icons: {
     icon: '/surplusfunds_favicon.png',
     apple: '/surplusfunds_favicon.png',
   },
   openGraph: {
-    title: 'Surplus Funds Directory',
-    description: 'Find surplus funds from rural US county public records',
+    title: 'SurplusClickIT — Surplus Funds Directory',
+    description:
+      'Find surplus funds from US county public records. Search tax sale overages, foreclosure proceeds, and unclaimed property across hundreds of counties.',
+    url: 'https://surplusclickit.com',
+    siteName: 'SurplusClickIT',
     type: 'website',
+    locale: 'en_US',
+    images: [
+      {
+        url: '/surplusfunds_flat_minimal.png',
+        width: 1200,
+        height: 630,
+        alt: 'SurplusClickIT — Surplus Funds Directory',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SurplusClickIT — Surplus Funds Directory',
+    description:
+      'Find surplus funds from US county public records. Tax sale overages, foreclosure proceeds, unclaimed property.',
+    images: ['/surplusfunds_flat_minimal.png'],
   },
 };
 

@@ -1,0 +1,13 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'OSINT Tools',
+  description:
+    'Pro OSINT tools for asset recovery professionals. Search people, verify addresses, look up phone numbers, check emails, and find social profiles.',
+  alternates: { canonical: '/osint' },
+  robots: { index: false, follow: false },
+};
+
+export default function OsintLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
