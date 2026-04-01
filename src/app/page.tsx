@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Building2, UserPlus, Search, FileText, Shield, DollarSign, Clock, Scale, Send } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
-import CountyCard from '@/components/county/CountyCard';
 import SearchBar from '@/components/search/SearchBar';
 
 async function getStats() {
@@ -16,16 +15,22 @@ async function getStats() {
   return { totalCounties, stateCount: stateGroups, withUrls };
 }
 
-async function getFeaturedCounties() {
+async function getRecentCounties() {
   return prisma.county.findMany({
     where: { listUrl: { not: null } },
-    orderBy: [{ population: 'desc' }],
-    take: 6,
+    orderBy: [{ state: 'asc' }, { name: 'asc' }],
+    take: 25,
   });
 }
 
+function formatPop(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}k`;
+  return n.toString();
+}
+
 export default async function HomePage() {
-  const [stats, featured] = await Promise.all([getStats(), getFeaturedCounties()]);
+  const [stats, counties] = await Promise.all([getStats(), getRecentCounties()]);
 
   return (
     <div>
@@ -213,33 +218,69 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured counties with confirmed online lists */}
+      {/* County Data Table — fully public */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Counties with Online Lists</h2>
-            <p className="text-sm text-gray-500">Confirmed public surplus funds lists available online</p>
+            <h2 className="text-xl font-semibold text-gray-900">Surplus Funds Directory</h2>
+            <p className="text-sm text-gray-500">All data is public — no login required</p>
           </div>
           <Link
             href="/directory"
             className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
           >
-            View all <ArrowRight className="h-4 w-4" />
+            View all {stats.totalCounties} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
-        {featured.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map(county => (
-              <CountyCard key={county.id} county={county} />
-            ))}
+        {counties.length > 0 ? (
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">County</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Population</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deadline</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">List</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {counties.map(county => (
+                  <tr key={county.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm">
+                      <Link href={`/county/${county.id}`} className="font-medium text-blue-600 hover:underline">
+                        {county.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{county.state}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{county.population > 0 ? formatPop(county.population) : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">{county.source || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{county.claimDeadline || '—'}</td>
+                    <td className="px-4 py-3 text-sm">
+                      {county.listUrl ? (
+                        <a
+                          href={county.listUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-blue-600 hover:underline text-xs"
+                        >
+                          View list <ArrowRight className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-gray-300 p-12 text-center">
             <Building2 className="mx-auto mb-3 h-8 w-8 text-gray-300" />
-            <p className="text-sm text-gray-500">
-              Counties are being loaded. Check back shortly.
-            </p>
+            <p className="text-sm text-gray-500">Counties are being loaded. Check back shortly.</p>
           </div>
         )}
 

@@ -1,14 +1,11 @@
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { scrapeCounty } from '@/lib/scraper';
 import { ok, err, handleError } from '@/lib/api-utils';
 
 export async function POST(_req: NextRequest, { params }: { params: { county: string } }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) return err('Unauthorized', 401);
+    // Allow public access for now — auth gating will be re-enabled later
 
     const county = await prisma.county.findUnique({ where: { id: params.county } });
     if (!county) return err('County not found', 404);

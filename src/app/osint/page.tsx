@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
-import { Search, Users, MapPin, Phone, Mail, Lock, AtSign } from 'lucide-react';
+import { Search, Users, MapPin, Phone, Mail, AtSign } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
@@ -25,27 +24,14 @@ const TOOLS = [
 ];
 
 export default function OsintPage() {
-  const { data: session } = useSession();
   const [activeTool, setActiveTool] = useState<ToolType>('people');
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState('');
 
-  const isPro = session?.user?.role === 'pro' || session?.user?.role === 'admin';
-
   const handleSearch = async () => {
     if (!query.trim()) return;
-
-    if (!session) {
-      signIn(undefined, { callbackUrl: '/osint' });
-      return;
-    }
-
-    if (!isPro) {
-      setError('OSINT tools require a Pro subscription. Upgrade on the pricing page.');
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -79,13 +65,6 @@ export default function OsintPage() {
         <p className="text-sm text-gray-500">
           Public records lookup for asset recovery and skip tracing
         </p>
-        {!isPro && session && (
-          <div className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
-            <Lock className="inline h-4 w-4 mr-1" />
-            OSINT tools are available with a Pro subscription.{' '}
-            <a href="/pricing" className="font-medium underline">Upgrade now</a>
-          </div>
-        )}
       </div>
 
       {/* Tool selector */}
@@ -117,7 +96,7 @@ export default function OsintPage() {
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
             />
           </div>
-          <Button onClick={handleSearch} loading={loading} disabled={!isPro && !!session}>
+          <Button onClick={handleSearch} loading={loading}>
             <Search className="mr-1.5 h-4 w-4" />
             Search
           </Button>
