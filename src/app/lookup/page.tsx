@@ -459,11 +459,11 @@ export default function LookupToolsPage() {
             const isExpanded = expandedCats.has(cat.id);
             return (
               <div key={cat.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                <button
-                  onClick={() => toggleExpand(cat.id)}
-                  className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                  <div
+                    className="flex flex-1 items-center gap-2 cursor-pointer"
+                    onClick={() => toggleExpand(cat.id)}
+                  >
                     <div className={`rounded-lg p-1.5 ${cat.bg}`}>
                       <cat.icon className={`h-4 w-4 ${cat.color}`} />
                     </div>
@@ -471,39 +471,43 @@ export default function LookupToolsPage() {
                     <span className="text-xs text-gray-400">{cat.tools.length} tools</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
+                    <span
+                      onClick={() => {
                         setActiveCategory(cat.id);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
                     >
                       Use
-                    </button>
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-gray-400" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
-                    )}
+                    </span>
+                    <span className="cursor-pointer" onClick={() => toggleExpand(cat.id)}>
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                      )}
+                    </span>
                   </div>
-                </button>
+                </div>
                 {isExpanded && (
                   <div className="border-t border-gray-100 px-4 py-3">
                     <div className="flex flex-wrap gap-2">
                       {cat.tools.map(tool => (
-                        <button
+                        <span
                           key={tool.name}
                           onClick={() => {
                             if (!query.trim()) return;
                             window.open(tool.url(query.trim()), '_blank', 'noopener');
                           }}
-                          disabled={!query.trim()}
-                          className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className={`inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1.5 text-xs cursor-pointer ${
+                            query.trim()
+                              ? 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              : 'text-gray-300 cursor-not-allowed'
+                          }`}
                         >
                           {tool.name}
                           <ExternalLink className="h-3 w-3 text-gray-300" />
-                        </button>
+                        </span>
                       ))}
                     </div>
                   </div>
