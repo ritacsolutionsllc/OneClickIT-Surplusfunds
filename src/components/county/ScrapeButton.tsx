@@ -21,6 +21,8 @@ export default function ScrapeButton({ countyId, hasListUrl }: ScrapeButtonProps
       if (res.ok) {
         setMessage(`Done — ${data.data?.count ?? 0} records found`);
         setTimeout(() => window.location.reload(), 1500);
+      } else if (res.status === 401) {
+        setMessage('Sign in to refresh data');
       } else {
         setMessage(data.error || 'Scrape failed');
       }
