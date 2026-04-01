@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ArrowRight, Building2, UserPlus, Search, FileText, Shield, DollarSign, Clock, Scale, Send } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import SearchBar from '@/components/search/SearchBar';
+import DonateSection from '@/components/DonateSection';
 
 async function getStats() {
   const [totalCounties, stateGroups, withUrls] = await Promise.all([
@@ -294,6 +295,9 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Donate to keep the site free */}
+      <DonateSection />
 
       {/* Disclaimer */}
       <section className="bg-amber-50 border-t border-amber-200 px-4 py-6">
