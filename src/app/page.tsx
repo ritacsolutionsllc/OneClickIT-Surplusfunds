@@ -2,23 +2,24 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Building2 } from 'lucide-react';
+import { ArrowRight, Building2, UserPlus, Search, Download } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import CountyCard from '@/components/county/CountyCard';
 import SearchBar from '@/components/search/SearchBar';
 
 async function getStats() {
-  const [totalCounties, stateCount] = await Promise.all([
+  const [totalCounties, stateGroups, withUrls] = await Promise.all([
     prisma.county.count(),
     prisma.county.groupBy({ by: ['state'] }).then(r => r.length),
+    prisma.county.count({ where: { listUrl: { not: null } } }),
   ]);
-  return { totalCounties, stateCount };
+  return { totalCounties, stateCount: stateGroups, withUrls };
 }
 
 async function getFeaturedCounties() {
   return prisma.county.findMany({
     where: { listUrl: { not: null } },
-    orderBy: { rank: 'asc' },
+    orderBy: [{ population: 'desc' }],
     take: 6,
   });
 }
@@ -41,10 +42,10 @@ export default async function HomePage() {
             <Image src="/surplusfunds_favicon.png" alt="Surplus Funds" width={64} height={64} className="mx-auto h-16 w-16" />
           </div>
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-500/30 px-3 py-1 text-sm text-blue-100">
-            {stats.totalCounties} counties across {stats.stateCount} states
+            {stats.withUrls} counties with online lists across {stats.stateCount} states
           </div>
           <h1 className="mb-4 text-3xl font-bold text-white sm:text-5xl">
-            Find Surplus Funds<br />from Rural US Counties
+            Find Surplus Funds<br />from US Counties
           </h1>
           <p className="mb-8 text-lg text-blue-100">
             Search publicly available tax sale proceeds, foreclosure overages, and unclaimed
@@ -54,7 +55,7 @@ export default async function HomePage() {
             <SearchBar size="large" />
           </div>
           <div className="mt-4 flex justify-center gap-4 text-sm text-blue-200">
-            <span>Try: Alpine CA · Inyo CA · Loving TX</span>
+            <span>Try: Los Angeles · Sacramento · Maricopa AZ · DeKalb GA</span>
           </div>
         </div>
       </section>
@@ -72,13 +73,61 @@ export default async function HomePage() {
               <div className="text-gray-500">States covered</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-600">Weekly</div>
-              <div className="text-gray-500">Auto-updated</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.withUrls}</div>
+              <div className="text-gray-500">Online lists</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-blue-600">Free</div>
-              <div className="text-gray-500">Public data only</div>
+              <div className="text-gray-500">Public data</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it works — 3 steps */}
+      <section className="bg-gray-50 border-b border-gray-200 px-4 py-12">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-8 text-center text-xl font-semibold text-gray-900">Get Started in 3 Steps</h2>
+          <div className="grid gap-6 sm:grid-cols-3">
+            <div className="rounded-xl bg-white p-6 text-center shadow-sm border border-gray-100">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <UserPlus className="h-6 w-6" />
+              </div>
+              <div className="mb-1 text-sm font-semibold text-blue-600">Step 1</div>
+              <h3 className="mb-2 font-semibold text-gray-900">Create Free Account</h3>
+              <p className="text-sm text-gray-500">
+                Sign up with Google in seconds. No credit card required.
+              </p>
+            </div>
+            <div className="rounded-xl bg-white p-6 text-center shadow-sm border border-gray-100">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600">
+                <Search className="h-6 w-6" />
+              </div>
+              <div className="mb-1 text-sm font-semibold text-green-600">Step 2</div>
+              <h3 className="mb-2 font-semibold text-gray-900">Search Counties</h3>
+              <p className="text-sm text-gray-500">
+                Browse {stats.totalCounties} counties across {stats.stateCount} states. Filter by state, population, or keyword.
+              </p>
+            </div>
+            <div className="rounded-xl bg-white p-6 text-center shadow-sm border border-gray-100">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                <Download className="h-6 w-6" />
+              </div>
+              <div className="mb-1 text-sm font-semibold text-purple-600">Step 3</div>
+              <h3 className="mb-2 font-semibold text-gray-900">Access Lists</h3>
+              <p className="text-sm text-gray-500">
+                View direct links to official surplus funds lists. Upgrade to Pro for CSV exports and OSINT tools.
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-medium text-white hover:bg-green-700"
+            >
+              <UserPlus className="h-4 w-4" />
+              Create free account
+            </Link>
           </div>
         </div>
       </section>
@@ -108,7 +157,7 @@ export default async function HomePage() {
           <div className="rounded-xl border border-dashed border-gray-300 p-12 text-center">
             <Building2 className="mx-auto mb-3 h-8 w-8 text-gray-300" />
             <p className="text-sm text-gray-500">
-              Counties are being seeded. Run <code className="rounded bg-gray-100 px-1">npm run db:seed</code> to populate.
+              Counties are being loaded. Check back shortly.
             </p>
           </div>
         )}
