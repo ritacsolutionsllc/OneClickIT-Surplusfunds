@@ -125,7 +125,9 @@ export default function OsintPage() {
                       <span className="font-medium text-gray-500 capitalize min-w-[100px]">
                         {key.replace(/_/g, ' ')}:
                       </span>
-                      <span className="text-gray-900">{String(value || '—')}</span>
+                      <span className="text-gray-900">
+                        {value == null ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                      </span>
                     </div>
                   ))}
                 </div>

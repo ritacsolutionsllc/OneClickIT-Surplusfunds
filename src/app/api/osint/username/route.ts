@@ -1,11 +1,7 @@
 import { NextRequest } from 'next/server';
 import { ok, handleError } from '@/lib/api-utils';
-import { requirePro } from '@/lib/osint';
 
 export async function POST(request: NextRequest) {
-  const denied = await requirePro();
-  if (denied) return denied;
-
   try {
     const { query } = await request.json();
     if (!query) return ok({ query, tool: 'username', results: [], source: 'No query' });
