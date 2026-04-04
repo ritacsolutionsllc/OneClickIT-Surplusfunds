@@ -141,10 +141,10 @@ export default function DorksPage() {
                     </code>
                   </div>
                   <div className="flex flex-shrink-0 gap-1">
-                    <Button size="sm" variant="outline" onClick={() => handleCopy(query, idx)}>
+                    <Button size="sm" variant="outline" onClick={() => handleCopy(query, idx)} aria-label={`Copy ${dork.name} query`}>
                       {copiedIdx === idx ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                     </Button>
-                    <Button size="sm" variant="primary" onClick={() => openGoogle(query)}>
+                    <Button size="sm" variant="primary" onClick={() => openGoogle(query)} aria-label={`Search Google for ${dork.name}`}>
                       <Search className="h-3.5 w-3.5" />
                     </Button>
                   </div>

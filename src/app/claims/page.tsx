@@ -169,11 +169,11 @@ export default function ClaimsPage() {
 
       {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-3">
-        <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        <Select aria-label="Filter by status" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </Select>
-        <Select value={filterState} onChange={e => setFilterState(e.target.value)}>
+        <Select aria-label="Filter by state" value={filterState} onChange={e => setFilterState(e.target.value)}>
           <option value="">All states</option>
           {US_STATES.map(s => <option key={s.code} value={s.code}>{s.code}</option>)}
         </Select>
@@ -204,12 +204,12 @@ export default function ClaimsPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Owner</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">County</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Deadline</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Actions</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Owner</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">County</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Amount</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Deadline</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -230,6 +230,7 @@ export default function ClaimsPage() {
                       <select
                         value={claim.status}
                         onChange={e => updateStatus(claim.id, e.target.value)}
+                        aria-label={`Change status for ${claim.ownerName}`}
                         className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${so?.color || ''}`}
                       >
                         {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}

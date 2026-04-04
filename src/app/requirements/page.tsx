@@ -48,6 +48,7 @@ export default function RequirementsPage() {
               <button
                 key={req.state}
                 onClick={() => setSelectedState(req.state)}
+                aria-label={`View ${req.stateName} claim requirements`}
                 className="rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm hover:border-blue-300 hover:shadow transition-all"
               >
                 <div className="flex items-center justify-between mb-1">

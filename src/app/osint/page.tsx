@@ -73,6 +73,8 @@ export default function OsintPage() {
           <button
             key={t.id}
             onClick={() => { setActiveTool(t.id); setResult(null); setError(''); }}
+            aria-label={`Select ${t.name} tool`}
+            aria-pressed={activeTool === t.id}
             className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               activeTool === t.id
                 ? 'bg-green-600 text-white'
