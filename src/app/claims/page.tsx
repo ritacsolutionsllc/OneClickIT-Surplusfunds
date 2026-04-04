@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { Plus, ArrowRight, AlertTriangle, FileSearch } from 'lucide-react';
+import { Plus, ArrowRight, AlertTriangle, FileSearch, LogIn } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Select from '@/components/ui/Select';
@@ -38,6 +39,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function ClaimsPage() {
+  const { data: session, status: authStatus } = useSession();
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('');
@@ -49,6 +51,7 @@ export default function ClaimsPage() {
   const [saving, setSaving] = useState(false);
 
   const fetchClaims = useCallback(async () => {
+    if (!session) { setLoading(false); return; }
     const params = new URLSearchParams();
     if (filterStatus) params.set('status', filterStatus);
     if (filterState) params.set('state', filterState);
@@ -56,7 +59,7 @@ export default function ClaimsPage() {
     const data = await res.json();
     if (res.ok) setClaims(data.data);
     setLoading(false);
-  }, [filterStatus, filterState]);
+  }, [filterStatus, filterState, session]);
 
   useEffect(() => { fetchClaims(); }, [fetchClaims]);
 
@@ -105,7 +108,7 @@ export default function ClaimsPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Claim Tracker</h1>
-          <p className="text-sm text-gray-500">Track and manage your surplus funds claims pipeline</p>
+          <p className="text-sm text-gray-500">Keep all your surplus funds cases organized &mdash; add counties, owners, filing dates, and notes so nothing slips through the cracks.</p>
         </div>
         <Button onClick={() => setShowCreate(!showCreate)}>
           <Plus className="mr-1.5 h-4 w-4" />
@@ -166,11 +169,11 @@ export default function ClaimsPage() {
 
       {/* Filters */}
       <div className="mb-4 flex flex-wrap gap-3">
-        <Select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        <Select aria-label="Filter by status" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All statuses</option>
           {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </Select>
-        <Select value={filterState} onChange={e => setFilterState(e.target.value)}>
+        <Select aria-label="Filter by state" value={filterState} onChange={e => setFilterState(e.target.value)}>
           <option value="">All states</option>
           {US_STATES.map(s => <option key={s.code} value={s.code}>{s.code}</option>)}
         </Select>
@@ -179,6 +182,18 @@ export default function ClaimsPage() {
       {/* Claims table */}
       {loading ? (
         <div className="py-12 text-center text-sm text-gray-400">Loading claims...</div>
+      ) : !session && authStatus !== 'loading' ? (
+        <Card className="py-12 text-center">
+          <LogIn className="mx-auto mb-3 h-8 w-8 text-gray-300" />
+          <p className="text-sm text-gray-500 mb-3">Sign in to track and manage your surplus funds claims.</p>
+          <Link
+            href="/auth/signin"
+            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+          >
+            <LogIn className="h-4 w-4" />
+            Sign in to get started
+          </Link>
+        </Card>
       ) : claims.length === 0 ? (
         <Card className="py-12 text-center">
           <FileSearch className="mx-auto mb-3 h-8 w-8 text-gray-300" />
@@ -189,12 +204,12 @@ export default function ClaimsPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Owner</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">County</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Deadline</th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Actions</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Owner</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">County</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Amount</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Deadline</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -215,6 +230,7 @@ export default function ClaimsPage() {
                       <select
                         value={claim.status}
                         onChange={e => updateStatus(claim.id, e.target.value)}
+                        aria-label={`Change status for ${claim.ownerName}`}
                         className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${so?.color || ''}`}
                       >
                         {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}

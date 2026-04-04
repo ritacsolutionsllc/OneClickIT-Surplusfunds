@@ -68,6 +68,7 @@ export default function TemplatesPage() {
             <button
               key={template.id}
               onClick={() => handleSelect(template)}
+              aria-label={`Use ${template.name} template`}
               className="rounded-xl border border-gray-200 bg-white p-5 text-left shadow-sm hover:border-blue-300 hover:shadow transition-all"
             >
               <div className="mb-2 flex items-center gap-2">
