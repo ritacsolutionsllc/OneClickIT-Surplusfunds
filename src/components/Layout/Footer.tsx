@@ -34,6 +34,7 @@ export default function Footer() {
             <h3 className="mb-3 text-sm font-semibold text-gray-900">Resources</h3>
             <ul className="space-y-2 text-sm text-gray-500">
               <li><Link href="/learn" className="hover:text-gray-900">Learning Center</Link></li>
+              <li><Link href="/grants" className="hover:text-gray-900">Grants Directory</Link></li>
               <li><Link href="/templates" className="hover:text-gray-900">Claim Templates</Link></li>
               <li><Link href="/calculator" className="hover:text-gray-900">Calculator</Link></li>
               <li><Link href="/requirements" className="hover:text-gray-900">Requirements by State</Link></li>
