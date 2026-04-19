@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
+import * as Sentry from '@sentry/nextjs';
 
 export function ok<T>(data: T, status = 200) {
   return NextResponse.json({ data }, { status });
@@ -11,8 +12,11 @@ export function err(message: string, status = 400) {
 
 export function handleError(error: unknown) {
   if (error instanceof ZodError) {
+    // Validation failures are expected — don't flood Sentry with 4xx noise.
     return err(error.errors.map(e => e.message).join(', '), 400);
   }
+  // Real server-side fault: capture for Sentry, log for local debugging.
+  Sentry.captureException(error);
   console.error(error);
   return err('Internal server error', 500);
 }
