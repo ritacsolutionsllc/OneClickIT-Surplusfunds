@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { err, handleError } from "@/lib/api-utils";
+import { rateLimit } from "@/lib/rate-limit";
 import { leadIngestRequestSchema } from "@/modules/surplus-data/schemas";
 import { ingestLeads } from "@/modules/surplus-data/server/ingest";
 import type { LeadIngestResponse } from "@/types/api";
@@ -22,6 +23,17 @@ export async function POST(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return err("unauthorized", 401);
+    }
+
+    // 1b. Rate limit — 20 ingest requests per 5 minutes per user.
+    // Ingest accepts up to 5000 rows per call; this is a generous envelope
+    // that stops runaway loops without blocking real bulk loading.
+    const rl = rateLimit(`ingest:${session.user.id}`, 20, 5 * 60_000);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "rate limit exceeded — try again in a few minutes" },
+        { status: 429, headers: { "X-RateLimit-Remaining": "0" } },
+      );
     }
 
     // 2. Content-Type — JSON only for v1
