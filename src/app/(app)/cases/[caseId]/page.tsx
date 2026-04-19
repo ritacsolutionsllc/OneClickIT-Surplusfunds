@@ -8,6 +8,8 @@ import {
 } from "@/modules/cases/server/service";
 import { StatusUpdater } from "./StatusUpdater";
 import { PortalLinkAction } from "./PortalLinkAction";
+import { ContactActions } from "./ContactActions";
+import { ContactLogItem } from "./ContactLogItem";
 
 export const dynamic = "force-dynamic";
 
@@ -150,6 +152,37 @@ export default async function CaseDetailPage({
               ))}
               {!detail.tasks.length && (
                 <p className="text-sm text-zinc-500">No tasks yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-white p-4 shadow-sm">
+            <h2 className="text-lg font-semibold">Log contact</h2>
+            <div className="mt-4">
+              <ContactActions caseId={detail.id} />
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-white p-4 shadow-sm">
+            <h2 className="text-lg font-semibold">Recent contacts</h2>
+            <div className="mt-4 space-y-2">
+              {detail.contactLogs.length === 0 ? (
+                <p className="text-sm text-zinc-500">No contacts logged yet.</p>
+              ) : (
+                detail.contactLogs.map((log) => (
+                  <ContactLogItem
+                    key={log.id}
+                    log={{
+                      id: log.id,
+                      channel: log.channel,
+                      direction: log.direction,
+                      status: log.status,
+                      notes: log.notes,
+                      duration: log.duration,
+                      createdAt: log.createdAt,
+                    }}
+                  />
+                ))
               )}
             </div>
           </div>
