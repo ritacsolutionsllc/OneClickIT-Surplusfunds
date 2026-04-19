@@ -1,17 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { claimVisibility, type ActorContext } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
-
-function claimScope(actor: ActorContext): Prisma.ClaimWhereInput {
-  if (actor.role === "admin") return {};
-  return {
-    OR: [{ userId: actor.userId }, { assigneeId: actor.userId }],
-  };
-}
+export type { ActorContext };
 
 export interface PipelineStage {
   status: string;
@@ -29,7 +19,7 @@ export async function pipelineByStatus(
 ): Promise<PipelineStage[]> {
   const rows = await prisma.claim.groupBy({
     by: ["status"],
-    where: claimScope(actor),
+    where: claimVisibility(actor),
     _count: { _all: true },
     _sum: { amount: true },
   });

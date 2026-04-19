@@ -7,39 +7,9 @@ import type {
 } from "../schemas";
 import { isFailedContactStatus } from "../failures";
 import { seedContactFailureFollowUpTask } from "@/modules/tasks/server/autogen";
+import { canActOnClaim, type ActorContext } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
-
-/** Reusable access check: owner, assignee, or admin may log / edit / delete. */
-async function canActOnClaim(
-  claimId: string,
-  actor: ActorContext,
-): Promise<
-  | { ok: true; claimantId: string | null; assigneeId: string | null; ownerId: string | null }
-  | { ok: false; reason: "notFound" | "forbidden" }
-> {
-  const claim = await prisma.claim.findUnique({
-    where: { id: claimId },
-    select: { userId: true, assigneeId: true, claimantId: true },
-  });
-  if (!claim) return { ok: false, reason: "notFound" };
-  if (
-    actor.role !== "admin" &&
-    claim.userId !== actor.userId &&
-    claim.assigneeId !== actor.userId
-  ) {
-    return { ok: false, reason: "forbidden" };
-  }
-  return {
-    ok: true,
-    claimantId: claim.claimantId,
-    assigneeId: claim.assigneeId,
-    ownerId: claim.userId,
-  };
-}
+export type { ActorContext };
 
 export type CreateContactLogResult =
   | { notFound: true }

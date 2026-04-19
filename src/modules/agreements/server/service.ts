@@ -8,10 +8,10 @@ import type {
 import { renderAgreement } from "./render";
 import { sendForSignature } from "./esign";
 import { seedAgreementFollowUpTask } from "@/modules/tasks/server/autogen";
+import type { ActorContext as BaseActorContext } from "@/lib/authz";
+import { canActOnClaimShape } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
+export interface ActorContext extends BaseActorContext {
   name: string;
 }
 
@@ -124,13 +124,7 @@ export async function createAgreement(
     },
   });
   if (!claim) return { notFound: true };
-  if (
-    actor.role !== "admin" &&
-    claim.userId !== actor.userId &&
-    claim.assigneeId !== actor.userId
-  ) {
-    return { forbidden: true };
-  }
+  if (!canActOnClaimShape(claim, actor)) return { forbidden: true };
 
   const feePercent =
     input.feePercent ?? claim.feePercent ?? DEFAULT_FEE_PERCENT;
@@ -178,11 +172,7 @@ export async function updateAgreement(
   });
   if (!existing) return { notFound: true };
 
-  const canEdit =
-    actor.role === "admin" ||
-    existing.claim.userId === actor.userId ||
-    existing.claim.assigneeId === actor.userId;
-  if (!canEdit) return { forbidden: true };
+  if (!canActOnClaimShape(existing.claim, actor)) return { forbidden: true };
 
   const data: Prisma.AgreementUpdateInput = {
     ...(input.status !== undefined ? { status: input.status as AgreementStatus } : {}),
@@ -229,11 +219,7 @@ export async function sendAgreement(
   });
   if (!existing) return { notFound: true };
 
-  const canEdit =
-    actor.role === "admin" ||
-    existing.claim.userId === actor.userId ||
-    existing.claim.assigneeId === actor.userId;
-  if (!canEdit) return { forbidden: true };
+  if (!canActOnClaimShape(existing.claim, actor)) return { forbidden: true };
 
   if (existing.status !== "DRAFT") {
     return { badState: true, reason: `cannot send from status ${existing.status}` };

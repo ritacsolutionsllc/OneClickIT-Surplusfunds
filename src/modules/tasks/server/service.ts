@@ -5,11 +5,9 @@ import type {
   TasksQueryInput,
   UpdateTaskInput,
 } from "../schemas";
+import type { ActorContext } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
+export type { ActorContext };
 
 function parseDate(value?: string | null): Date | null {
   if (!value) return null;

@@ -2,16 +2,14 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import type { CreateCaseInput, UpdateCaseInput, CasesQueryInput } from "../schemas";
 import { seedCaseKickoffTasks } from "@/modules/tasks/server/autogen";
+import type { ActorContext } from "@/lib/authz";
+
+export type { ActorContext };
 
 function parseDate(value?: string | null): Date | null {
   if (!value) return null;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
-}
-
-export interface ActorContext {
-  userId: string;
-  role: string;
 }
 
 /** Optional case-shape overrides at conversion time (fee, priority, assignee). */

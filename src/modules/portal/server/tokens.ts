@@ -2,6 +2,9 @@ import { randomBytes } from "node:crypto";
 
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
+import { canActOnClaimShape, type ActorContext } from "@/lib/authz";
+
+export type { ActorContext };
 
 const portalClaimInclude = {
   claimant: {
@@ -33,21 +36,6 @@ function newToken(): string {
   return randomBytes(32).toString("base64url");
 }
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
-
-function canManage(
-  claim: { userId: string | null; assigneeId: string | null },
-  actor: ActorContext,
-): boolean {
-  if (actor.role === "admin") return true;
-  if (claim.userId === actor.userId) return true;
-  if (claim.assigneeId === actor.userId) return true;
-  return false;
-}
-
 export type IssuePortalTokenResult =
   | { notFound: true }
   | { forbidden: true }
@@ -73,7 +61,7 @@ export async function issuePortalToken(
     },
   });
   if (!claim) return { notFound: true };
-  if (!canManage(claim, actor)) return { forbidden: true };
+  if (!canActOnClaimShape(claim, actor)) return { forbidden: true };
 
   const ttlDays = opts.ttlDays ?? DEFAULT_TTL_DAYS;
   const expiresAt = new Date(Date.now() + ttlDays * 86_400_000);

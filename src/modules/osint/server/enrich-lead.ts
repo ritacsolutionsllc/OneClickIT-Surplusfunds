@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { lookupPerson } from "./providers/people-data-labs";
 import { rescoreOne } from "@/modules/leads/server/scoring";
+import type { ActorContext } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
+export type { ActorContext };
 
 export type EnrichLeadResult =
   | { notFound: true }

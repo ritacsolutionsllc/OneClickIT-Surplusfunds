@@ -1,22 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { claimVisibility, type ActorContext } from "@/lib/authz";
 
-export interface ActorContext {
-  userId: string;
-  role: string;
-}
-
-/**
- * Build the visibility scope shared by all analytics queries.
- * Admins see the full picture; everyone else sees only cases they
- * own or are assigned to.
- */
-function claimScope(actor: ActorContext): Prisma.ClaimWhereInput {
-  if (actor.role === "admin") return {};
-  return {
-    OR: [{ userId: actor.userId }, { assigneeId: actor.userId }],
-  };
-}
+export type { ActorContext };
 
 export interface DashboardKpis {
   leads: {
@@ -48,7 +33,7 @@ export interface DashboardKpis {
 const TERMINAL_STATUSES = ["paid", "denied"];
 
 export async function dashboardKpis(actor: ActorContext): Promise<DashboardKpis> {
-  const scope = claimScope(actor);
+  const scope = claimVisibility(actor);
 
   // Leads + agreement aggregates: leads aren't user-scoped yet, so these are
   // global for non-admin callers too. Keeping the aggregate simple for v1.
