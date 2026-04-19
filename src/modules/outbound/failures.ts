@@ -61,11 +61,16 @@ export function isFailedContactStatus(attempt: ContactAttemptShape): boolean {
   const raw = attempt.status?.trim().toLowerCase() ?? "";
   if (!raw) return true;
 
-  // "success" style phrases short-circuit so we don't spam tasks.
+  // Check failure keywords first — they take precedence over success phrases
+  // so statuses like "delivered to voicemail" or "sent but bounced" are
+  // recognized as failures instead of being short-circuited by "delivered"/"sent".
+  if (FAILURE_KEYWORDS.some((kw) => raw.includes(kw))) return true;
+
+  // Plain "success" phrases → no follow-up.
   const ok = ["answered", "connected", "delivered", "opened", "replied", "sent"];
   if (ok.some((s) => raw === s || raw.startsWith(`${s} `))) return false;
 
-  return FAILURE_KEYWORDS.some((kw) => raw.includes(kw));
+  return false;
 }
 
 /** Human-readable title for the auto-generated follow-up task. */

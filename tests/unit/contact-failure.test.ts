@@ -84,6 +84,25 @@ describe("isFailedContactStatus", () => {
       }),
     ).toBe(true);
   });
+
+  it("treats mixed success+failure phrases as failures (failure wins)", () => {
+    // "delivered" is a success phrase, "voicemail" is a failure keyword —
+    // the failure signal must win so operators aren't silently dropped.
+    expect(
+      isFailedContactStatus({
+        channel: "CALL",
+        direction: "outbound",
+        status: "delivered to voicemail",
+      }),
+    ).toBe(true);
+    expect(
+      isFailedContactStatus({
+        channel: "EMAIL",
+        direction: "outbound",
+        status: "sent but bounced",
+      }),
+    ).toBe(true);
+  });
 });
 
 describe("followUpTitleForAttempt", () => {
