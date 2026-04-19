@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 import { auth } from '@/lib/auth';
 import { handleError } from "@/lib/api-utils";
@@ -7,7 +7,7 @@ import { dashboardKpis } from "@/modules/analytics/server/dashboard";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {

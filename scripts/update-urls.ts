@@ -911,7 +911,6 @@ async function main() {
   console.log(`Updating ${COUNTY_URLS.length} counties with verified URLs...`);
 
   let updated = 0;
-  let created = 0;
   let errors = 0;
   for (const county of COUNTY_URLS) {
     try {
