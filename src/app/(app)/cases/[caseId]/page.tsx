@@ -10,6 +10,7 @@ import { StatusUpdater } from "./StatusUpdater";
 import { PortalLinkAction } from "./PortalLinkAction";
 import { ContactActions } from "./ContactActions";
 import { ContactLogItem } from "./ContactLogItem";
+import { SendContactPanel } from "./SendContactPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -157,7 +158,25 @@ export default async function CaseDetailPage({
           </div>
 
           <div className="rounded-2xl border bg-white p-4 shadow-sm">
+            <h2 className="text-lg font-semibold">Send message</h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              Sends via provider and logs the attempt. Failed sends create a
+              follow-up task automatically.
+            </p>
+            <div className="mt-4">
+              <SendContactPanel
+                caseId={detail.id}
+                defaultPhone={detail.claimant?.phone ?? null}
+                defaultEmail={detail.claimant?.email ?? null}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-white p-4 shadow-sm">
             <h2 className="text-lg font-semibold">Log contact</h2>
+            <p className="mt-1 text-xs text-zinc-500">
+              Retroactively record a call, mail piece, or in-person visit.
+            </p>
             <div className="mt-4">
               <ContactActions caseId={detail.id} />
             </div>

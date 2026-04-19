@@ -29,5 +29,30 @@ export const updateContactLogSchema = z.object({
   duration: z.coerce.number().int().nonnegative().max(86_400).nullable().optional(),
 });
 
+/** Payload for POST /api/v1/cases/:id/contacts/send. */
+export const sendContactSchema = z
+  .object({
+    channel: z.enum(["SMS", "EMAIL"]),
+    to: z.string().min(3).max(200),
+    subject: z
+      .preprocess(emptyToUndefined, z.string().max(200).optional())
+      .optional(),
+    body: z.string().min(1).max(5000),
+    notes: z
+      .preprocess(emptyToUndefined, z.string().max(2000).optional())
+      .optional(),
+    claimantId: z.string().cuid().optional().nullable(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.channel === "EMAIL" && !v.subject) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["subject"],
+        message: "subject is required for EMAIL",
+      });
+    }
+  });
+
 export type CreateContactLogInput = z.infer<typeof createContactLogSchema>;
 export type UpdateContactLogInput = z.infer<typeof updateContactLogSchema>;
+export type SendContactInput = z.infer<typeof sendContactSchema>;
