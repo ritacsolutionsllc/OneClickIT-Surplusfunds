@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { listLeads } from "@/modules/leads/server/service";
 import { ConvertButton } from "./ConvertButton";
+import { SkipTraceButton } from "./SkipTraceButton";
 
 export const dynamic = "force-dynamic";
 
@@ -63,16 +64,22 @@ export default async function LeadsPage() {
                 </td>
                 <td className="px-4 py-3">{lead.status}</td>
                 <td className="px-4 py-3">
-                  {lead.claim?.id ? (
-                    <a
-                      href={`/cases/${lead.claim.id}`}
-                      className="rounded-lg bg-black px-3 py-1.5 text-xs text-white"
-                    >
-                      Open Case
-                    </a>
-                  ) : (
-                    <ConvertButton leadId={lead.id} />
-                  )}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {lead.claim?.id ? (
+                      <a
+                        href={`/cases/${lead.claim.id}`}
+                        className="rounded-lg bg-black px-3 py-1.5 text-xs text-white"
+                      >
+                        Open Case
+                      </a>
+                    ) : (
+                      <ConvertButton leadId={lead.id} />
+                    )}
+                    <SkipTraceButton
+                      leadId={lead.id}
+                      alreadyEnriched={lead.enriched}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

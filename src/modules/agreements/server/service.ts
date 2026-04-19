@@ -7,6 +7,7 @@ import type {
 } from "../schemas";
 import { renderAgreement } from "./render";
 import { sendForSignature } from "./esign";
+import { seedAgreementFollowUpTask } from "@/modules/tasks/server/autogen";
 
 export interface ActorContext {
   userId: string;
@@ -267,6 +268,18 @@ export async function sendAgreement(
       claimant: { select: { id: true, fullName: true, email: true } },
     },
   });
+
+  // Best-effort: seed a +5d follow-up task so unsigned agreements get nudged.
+  try {
+    await seedAgreementFollowUpTask(
+      agreement.id,
+      agreement.claimId,
+      existing.claim.assigneeId ?? existing.claim.userId ?? null,
+    );
+  } catch (e) {
+    console.error("[agreements] followup task seed failed", agreement.id, e);
+  }
+
   return { agreement };
 }
 

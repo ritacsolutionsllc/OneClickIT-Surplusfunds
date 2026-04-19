@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import type { CreateCaseInput, UpdateCaseInput, CasesQueryInput } from "../schemas";
+import { seedCaseKickoffTasks } from "@/modules/tasks/server/autogen";
 
 function parseDate(value?: string | null): Date | null {
   if (!value) return null;
@@ -87,6 +88,13 @@ export async function convertLeadToCase(
 
     return created;
   });
+
+  // Best-effort kickoff task for converted leads too.
+  try {
+    await seedCaseKickoffTasks(claim.id, claim.assigneeId ?? claim.userId);
+  } catch (e) {
+    console.error("[cases] seedCaseKickoffTasks failed", claim.id, e);
+  }
 
   return { claim };
 }
@@ -315,6 +323,13 @@ export async function createCase(input: CreateCaseInput, actor: ActorContext) {
       where: { id: input.leadId },
       data: { status: "CONVERTED" },
     });
+  }
+
+  // Best-effort kickoff task; never fail case creation if task insert hiccups.
+  try {
+    await seedCaseKickoffTasks(claim.id, claim.assigneeId ?? claim.userId);
+  } catch (e) {
+    console.error("[cases] seedCaseKickoffTasks failed", claim.id, e);
   }
 
   return claim;
