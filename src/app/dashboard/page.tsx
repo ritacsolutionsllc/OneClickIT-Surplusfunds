@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Bell, Bookmark, MapPin, Search, Download, Shield, CreditCard, ArrowRight, Wrench, Globe, FileText, Calculator, ClipboardList, FileDown } from 'lucide-react';
@@ -10,7 +9,7 @@ import Badge from '@/components/ui/Badge';
 
 export default async function DashboardPage() {
   let session = null;
-  try { session = await getServerSession(authOptions); } catch { /* auth unavailable */ }
+  try { session = await auth(); } catch { /* auth unavailable */ }
 
   let stats = 0;
   try { stats = await prisma.county.count(); } catch { /* db unavailable */ }

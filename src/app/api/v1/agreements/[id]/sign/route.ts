@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { handleError } from "@/lib/api-utils";
 import { markSigned } from "@/modules/agreements/server/service";
 
@@ -22,7 +21,7 @@ interface RouteContext {
  */
 export async function POST(_: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }

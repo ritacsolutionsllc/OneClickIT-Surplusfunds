@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { handleError } from "@/lib/api-utils";
 import { overdueTasks } from "@/modules/tasks/server/service";
 
@@ -10,7 +9,7 @@ export const runtime = "nodejs";
 
 export async function GET(_request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }

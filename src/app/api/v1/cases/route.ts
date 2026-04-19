@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { handleError } from "@/lib/api-utils";
 import { createCaseSchema, casesQuerySchema } from "@/modules/cases/schemas";
 import { createCase, listCases } from "@/modules/cases/server/service";
@@ -12,7 +11,7 @@ export const runtime = "nodejs";
 /** GET /api/v1/cases — paginated, filterable listing of Claim rows. */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
@@ -41,7 +40,7 @@ export async function GET(request: NextRequest) {
 /** POST /api/v1/cases — author a new case (Claim row), optionally from a lead. */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }

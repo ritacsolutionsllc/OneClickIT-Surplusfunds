@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { handleError } from "@/lib/api-utils";
 import { getCaseTimeline } from "@/modules/cases/server/service";
 
@@ -15,7 +14,7 @@ interface RouteContext {
 /** GET /api/v1/cases/:id/timeline — merged activity/task/agreement/contact stream. */
 export async function GET(_request: NextRequest, context: RouteContext) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }

@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { listLeads } from "@/modules/leads/server/service";
 import { ConvertButton } from "./ConvertButton";
 import { SkipTraceButton } from "./SkipTraceButton";
@@ -9,7 +8,7 @@ import { SkipTraceButton } from "./SkipTraceButton";
 export const dynamic = "force-dynamic";
 
 export default async function LeadsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { data: items } = await listLeads({ page: 1, limit: 50 });

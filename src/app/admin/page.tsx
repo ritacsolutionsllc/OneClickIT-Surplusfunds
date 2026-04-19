@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Building2, Upload, RefreshCw, List } from 'lucide-react';
@@ -9,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 
 export default async function AdminPage() {
   let session = null;
-  try { session = await getServerSession(authOptions); } catch { /* auth unavailable */ }
+  try { session = await auth(); } catch { /* auth unavailable */ }
   if (!session || session.user.role !== 'admin') redirect('/');
 
   let totalCounties = 0;

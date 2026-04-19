@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { getAgreement } from "@/modules/agreements/server/service";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +21,7 @@ interface RouteContext {
  * headers (Content-Type, Content-Disposition) stay the same shape.
  */
 export async function GET(_: NextRequest, context: RouteContext) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }

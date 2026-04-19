@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { ok, err, handleError } from '@/lib/api-utils';
 import { searchSchema, countySchema } from '@/lib/validators';
@@ -46,7 +45,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (session?.user?.role !== 'admin') return err('Forbidden', 403);
 
     const body = await request.json();

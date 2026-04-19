@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import {
   getCaseById,
   getCaseTimeline,
@@ -19,7 +18,7 @@ export default async function CaseDetailPage({
   params: Promise<{ caseId: string }>;
 }) {
   const { caseId } = await params;
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const actor = { userId: session.user.id, role: session.user.role };

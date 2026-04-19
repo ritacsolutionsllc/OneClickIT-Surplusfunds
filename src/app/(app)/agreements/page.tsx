@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { listAgreements } from "@/modules/agreements/server/service";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +15,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default async function AgreementsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const { data: items } = await listAgreements(

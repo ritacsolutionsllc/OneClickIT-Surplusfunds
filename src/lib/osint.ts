@@ -1,5 +1,4 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth';
+import { auth } from './auth';
 import { err } from './api-utils';
 import { rateLimit } from './rate-limit';
 
@@ -8,7 +7,7 @@ import { rateLimit } from './rate-limit';
  * Returns null if authorized, or an error Response if not.
  */
 export async function requirePro() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) return err('Unauthorized', 401);
   if (session.user.role !== 'pro' && session.user.role !== 'admin') {
     return err('Pro subscription required for OSINT tools', 403);

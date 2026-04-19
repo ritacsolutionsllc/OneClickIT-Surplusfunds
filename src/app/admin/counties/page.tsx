@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { ArrowLeft, Pencil, ExternalLink } from 'lucide-react';
@@ -11,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminCountiesPage() {
   let session = null;
-  try { session = await getServerSession(authOptions); } catch { /* auth unavailable */ }
+  try { session = await auth(); } catch { /* auth unavailable */ }
   if (!session || session.user.role !== 'admin') redirect('/');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import {
   dueToday,
   listTasks,
@@ -14,7 +13,7 @@ export const dynamic = "force-dynamic";
 type Tone = "red" | "amber" | "zinc";
 
 export default async function TasksPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const actor = { userId: session.user.id, role: session.user.role };

@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { dashboardKpis } from "@/modules/analytics/server/dashboard";
 import { pipelineByStatus } from "@/modules/analytics/server/pipeline";
 import { topCountiesByLeads } from "@/modules/analytics/server/counties";
@@ -31,7 +30,7 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 export default async function InsightsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const actor = { userId: session.user.id, role: session.user.role };

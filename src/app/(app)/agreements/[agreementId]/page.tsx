@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { getAgreement } from "@/modules/agreements/server/service";
 import { AgreementActions } from "./AgreementActions";
 
@@ -13,7 +12,7 @@ export default async function AgreementDetailPage({
   params: Promise<{ agreementId: string }>;
 }) {
   const { agreementId } = await params;
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
   const result = await getAgreement(agreementId, {

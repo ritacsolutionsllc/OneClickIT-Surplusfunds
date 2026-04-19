@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { ok, err } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +9,7 @@ export async function POST(request: NextRequest) {
     return err('Stripe not configured', 503);
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.email) return err('Unauthorized', 401);
 
   const { priceId } = await request.json();

@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { BookOpen, AlertTriangle, Scale, DollarSign, FileText, Search, Users, Shield } from 'lucide-react';
 import Link from 'next/link';
 
@@ -307,7 +306,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 };
 
 export default async function LearnPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session) redirect('/auth/signin?callbackUrl=/learn');
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">

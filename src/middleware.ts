@@ -1,4 +1,4 @@
-export { default } from 'next-auth/middleware';
+export { auth as default } from '@/lib/auth';
 
 // These routes require any authenticated session (free account).
 // Note: the `(app)` route group in src/app does NOT appear in the URL path,

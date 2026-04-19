@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { scrapeCounty } from '@/lib/scraper';
 import { ok, err, handleError } from '@/lib/api-utils';
@@ -8,7 +7,7 @@ import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ county: string }> }) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) return err('Unauthorized', 401);
 
     // Rate limit: 5 scrapes per minute per user

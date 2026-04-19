@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/auth";
+import { auth } from '@/lib/auth';
 import { err, handleError } from "@/lib/api-utils";
 import { rateLimit } from "@/lib/rate-limit";
 import { leadIngestRequestSchema } from "@/modules/surplus-data/schemas";
@@ -20,7 +19,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     // 1. Auth
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.id) {
       return err("unauthorized", 401);
     }
