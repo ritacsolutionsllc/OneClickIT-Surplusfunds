@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Partners',
   description:
-    'OneClickIT.ai technology partnership. Get expert tech support, custom development, and AI-powered solutions for your business.',
+    'Our partners: OneClickIT.ai for technology and AI automation, OneClickITLeads.com for surplus-funds data and lead generation.',
   alternates: { canonical: '/partners' },
 };
 
