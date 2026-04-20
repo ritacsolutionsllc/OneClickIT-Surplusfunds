@@ -70,6 +70,10 @@ export default async function HomePage() {
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* Maintenance notice */}
+      <div className="bg-amber-500 px-4 py-2.5 text-center text-sm font-medium text-amber-950">
+        Site is under maintenance and upgrades &mdash; please check back soon for updates. Happy 420!
+      </div>
       {/* Launch banner */}
       <div className="bg-green-600 px-4 py-2.5 text-center text-sm font-medium text-white">
         Now Live &mdash; Start finding surplus funds today.{' '}
