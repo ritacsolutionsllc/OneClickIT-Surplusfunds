@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Monitor, Shield, Cpu, Phone, Wifi, HardDrive, Mail, Clock, CheckCircle2, ExternalLink, ArrowRight } from 'lucide-react';
+import { Monitor, Shield, Cpu, Phone, Wifi, HardDrive, Mail, Clock, CheckCircle2, ExternalLink, ArrowRight, Database, Target, Users, TrendingUp, MapPin, Filter } from 'lucide-react';
 
 export default function PartnersPage() {
   return (
@@ -8,9 +8,9 @@ export default function PartnersPage() {
       <div className="mb-10 text-center">
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Our Partners</h1>
         <p className="mt-2 text-gray-500 max-w-2xl mx-auto">
-          SurplusClickIT is powered by OneClickIT.ai, our technology partner providing managed
-          infrastructure, custom integrations, and AI automations. Together we help surplus-funds
-          professionals scale reliably.
+          SurplusClickIT works with OneClickIT.ai for technology and AI automation, and
+          OneClickITLeads.com for vetted surplus-funds data and qualified lead generation.
+          Together we help recovery professionals research, reach, and recover — reliably.
         </p>
       </div>
 
@@ -103,6 +103,78 @@ export default function PartnersPage() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* OneClickITLeads Feature Card */}
+      <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-8 shadow-sm mb-10">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Left — Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="rounded-xl bg-emerald-600 p-3">
+                <Database className="h-7 w-7 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">OneClickITLeads.com</h2>
+                <p className="text-sm text-emerald-700 font-medium">Data &amp; Lead Generation Partner</p>
+              </div>
+            </div>
+
+            <p className="text-gray-700 mb-4 text-lg font-medium">
+              Vetted surplus-funds leads, delivered.
+            </p>
+
+            <p className="text-gray-600 mb-6">
+              Recovering surplus funds starts with finding the right claimants. <strong>OneClickITLeads.com</strong>{' '}
+              specializes in surplus-funds data enrichment and qualified lead generation — pairing
+              public county records with vetted contact information so you spend less time
+              researching and more time recovering.
+            </p>
+
+            <p className="text-gray-600 mb-6">
+              Their pipeline enriches raw surplus lists with phone, email, and address data,
+              deduplicates against opt-outs, and delivers lead packets scoped to the states and
+              claim types you actually work.
+            </p>
+
+            <a
+              href="https://oneclickitleads.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white hover:bg-emerald-700 transition-colors"
+            >
+              Visit OneClickITLeads.com
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+
+          {/* Right — Services */}
+          <div className="lg:w-80 flex-shrink-0">
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+              What They Provide
+            </h3>
+            <div className="space-y-3">
+              {[
+                { icon: Database, label: 'Surplus-Funds Data', desc: 'County records enriched and deduplicated' },
+                { icon: Target, label: 'Qualified Leads', desc: 'Claimants matched to your filing criteria' },
+                { icon: Users, label: 'Contact Enrichment', desc: 'Phone, email, and address appending' },
+                { icon: MapPin, label: 'State-Scoped Packets', desc: 'Filter by jurisdictions you actually work' },
+                { icon: Filter, label: 'Opt-Out Scrubbing', desc: 'DNC and suppression lists honored' },
+                { icon: TrendingUp, label: 'Pipeline Ready', desc: 'Imports straight into SurplusClickIT' },
+              ].map(item => (
+                <div key={item.label} className="flex items-start gap-3">
+                  <div className="rounded-lg bg-emerald-100 p-1.5 mt-0.5">
+                    <item.icon className="h-4 w-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{item.label}</div>
+                    <div className="text-xs text-gray-500">{item.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

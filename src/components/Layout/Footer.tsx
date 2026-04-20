@@ -52,6 +52,26 @@ export default function Footer() {
               <li><Link href="/faq" className="hover:text-gray-900">FAQ</Link></li>
               <li><Link href="/partners" className="hover:text-gray-900">Partners</Link></li>
               <li><Link href="/pricing" className="hover:text-gray-900">Pricing</Link></li>
+              <li>
+                <a
+                  href="https://oneclickit.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900"
+                >
+                  OneClickIT.ai
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://oneclickitleads.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900"
+                >
+                  OneClickITLeads.com
+                </a>
+              </li>
               <li><Link href="/terms" className="hover:text-gray-900">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-gray-900">Privacy Policy</Link></li>
             </ul>
