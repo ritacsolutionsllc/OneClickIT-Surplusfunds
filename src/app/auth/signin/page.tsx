@@ -1,46 +1,56 @@
-'use client';
-import { signIn } from 'next-auth/react';
-import Image from 'next/image';
-import Link from 'next/link';
-import Button from '@/components/ui/Button';
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
-export default function SignInPage() {
+import { authOptions } from "@/lib/auth";
+import { SignInCard } from "../SignInCard";
+
+export const dynamic = "force-dynamic";
+
+/**
+ * Server-rendered wrapper around `SignInCard`. Two reasons this lives in an RSC:
+ *
+ *  1. If the user already has a session, skip the page entirely and send them
+ *     to the intended destination. Avoids the "why is the sign-in page
+ *     flashing when I'm already logged in?" UX bug.
+ *  2. NextAuth redirects failures back here with `?error=<code>`. Reading
+ *     `searchParams` server-side means the UI renders the operator message on
+ *     first paint instead of after a client effect hydrates.
+ */
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; callbackUrl?: string }>;
+}) {
+  const [session, params] = await Promise.all([
+    getServerSession(authOptions),
+    searchParams,
+  ]);
+
+  const callbackUrl = sanitizeCallback(params.callbackUrl);
+  if (session?.user?.id) redirect(callbackUrl);
+
+  const emailProviderEnabled = authOptions.providers.some(
+    (p) => p.id === "email",
+  );
+
   return (
-    <div className="flex min-h-[60vh] items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="mb-3 flex justify-center">
-            <Image src="/surplusfunds_favicon.png" alt="Surplus Funds" width={48} height={48} className="h-12 w-12" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-          <p className="text-sm text-gray-500">Sign in to your surplus funds dashboard</p>
-        </div>
-
-        <div className="space-y-3">
-          <Button
-            className="w-full"
-            variant="primary"
-            onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-          >
-            Sign in with Google
-          </Button>
-        </div>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Don&apos;t have an account?{' '}
-          <Link href="/auth/signup" className="text-blue-600 hover:underline font-medium">
-            Sign up free
-          </Link>
-        </p>
-
-        <p className="mt-4 text-center text-xs text-gray-400">
-          By signing in, you agree to our{' '}
-          <Link href="/terms" className="underline hover:text-gray-600">Terms of Service</Link>{' '}
-          and{' '}
-          <Link href="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>.
-          No legal claims are made on your behalf.
-        </p>
-      </div>
+    <div className="flex min-h-[60vh] items-center justify-center px-4 py-12">
+      <SignInCard
+        mode="signin"
+        callbackUrl={callbackUrl}
+        error={params.error}
+        emailProviderEnabled={emailProviderEnabled}
+      />
     </div>
   );
+}
+
+/**
+ * Only accept same-origin relative paths. Prevents the sign-in flow from
+ * being abused as an open redirect (e.g. `/auth/signin?callbackUrl=//evil.com`).
+ */
+function sanitizeCallback(raw: string | undefined): string {
+  if (!raw) return "/dashboard";
+  if (!raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
+  return raw;
 }
