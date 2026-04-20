@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { getServerSession } from 'next-auth';
+import { getServerSession } from '@/lib/auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';

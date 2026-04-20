@@ -1,4 +1,4 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { BookOpen, AlertTriangle, Scale, DollarSign, FileText, Search, Users, Shield } from 'lucide-react';

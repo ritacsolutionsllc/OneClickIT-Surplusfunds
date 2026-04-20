@@ -119,6 +119,7 @@ model FundsList {
 
 model User {
   id             String    @id @default(cuid())
+  clerkId        String?   @unique @map("clerk_id")
   email          String    @unique
   name           String?
   image          String?
