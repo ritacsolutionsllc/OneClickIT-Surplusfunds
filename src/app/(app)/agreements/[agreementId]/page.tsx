@@ -13,7 +13,7 @@ export default async function AgreementDetailPage({
   params: Promise<{ agreementId: string }>;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/auth/signin");
+  if (!session?.user?.id) redirect("/sign-in");
 
   const { agreementId } = await params;
   const result = await getAgreement(agreementId, {

@@ -49,7 +49,16 @@ export async function getCurrentActor(): Promise<ActorSession | null> {
   const email =
     profile?.primaryEmailAddress?.emailAddress ??
     profile?.emailAddresses?.[0]?.emailAddress ??
-    `${clerkId}@users.noreply.clerk`;
+    null;
+  // Clerk is configured to require an email identifier, so a missing email
+  // here points at a provisioning bug or a Clerk outage. Refuse to fabricate
+  // a synthetic placeholder — that would fork future sign-ins into a row
+  // that can never be reconciled with the real address once it arrives.
+  if (!email) {
+    throw new Error(
+      `Clerk user ${clerkId} has no email; cannot provision local User row.`,
+    );
+  }
   const name =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() ||
     profile?.username ||
@@ -106,10 +115,20 @@ function toSession(user: {
   image: string | null;
   role: string;
 }): ActorSession {
+  // getCurrentActor always resolves via Clerk first and either finds or
+  // upserts a row stamped with clerkId, so a null here means someone
+  // bypassed that path (stale test fixture, migration drift, etc.). Fail
+  // loudly rather than hand callers an empty-string identity they'd treat
+  // as "not logged in via Clerk."
+  if (!user.clerkId) {
+    throw new Error(
+      `User ${user.id} has no clerkId; refusing to build an ActorSession.`,
+    );
+  }
   return {
     user: {
       id: user.id,
-      clerkId: user.clerkId ?? '',
+      clerkId: user.clerkId,
       email: user.email,
       name: user.name,
       image: user.image,

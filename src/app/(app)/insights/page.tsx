@@ -32,7 +32,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default async function InsightsPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/auth/signin");
+  if (!session?.user?.id) redirect("/sign-in");
 
   const actor = { userId: session.user.id, role: session.user.role };
 

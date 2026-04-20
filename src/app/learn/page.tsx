@@ -308,7 +308,7 @@ const colorMap: Record<string, { bg: string; text: string; border: string }> = {
 
 export default async function LearnPage() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect('/auth/signin?callbackUrl=/learn');
+  if (!session) redirect('/sign-in?redirect_url=/learn');
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8 text-center">

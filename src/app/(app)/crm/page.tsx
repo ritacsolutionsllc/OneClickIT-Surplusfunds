@@ -18,7 +18,7 @@ const columns = [
 
 export default async function CRMPage() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/auth/signin");
+  if (!session?.user?.id) redirect("/sign-in");
 
   const { data: items } = await listCases(
     { page: 1, limit: 100 },
