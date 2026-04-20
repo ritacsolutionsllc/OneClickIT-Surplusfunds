@@ -74,11 +74,14 @@ export async function logContact(
   }
 
   const channel = input.channel as ContactChannel;
+  // claimantId is sourced from the claim itself (never trusted from input)
+  // to prevent a caller from attaching a log to a claimant that doesn't
+  // belong to this case.
   const contactLog = await prisma.contactLog.create({
     data: {
       claimId,
       userId: actor.userId,
-      claimantId: input.claimantId ?? gate.claimantId,
+      claimantId: gate.claimantId,
       channel,
       direction: input.direction,
       status: input.status ?? null,

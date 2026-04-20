@@ -19,7 +19,6 @@ export const createContactLogSchema = z.object({
     .preprocess(emptyToUndefined, z.string().max(2000).optional())
     .optional(),
   duration: z.coerce.number().int().nonnegative().max(86_400).optional(),
-  claimantId: z.string().cuid().optional().nullable(),
   externalId: z.string().max(200).optional().nullable(),
 });
 
@@ -52,7 +51,6 @@ export const sendOutboundSchema = z
     notes: z
       .preprocess(emptyToUndefined, z.string().max(2000).optional())
       .optional(),
-    claimantId: z.string().cuid().optional().nullable(),
   })
   .superRefine((val, ctx) => {
     if (val.channel === "EMAIL" && !val.subject) {

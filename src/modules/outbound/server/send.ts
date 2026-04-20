@@ -95,8 +95,10 @@ export async function sendOutbound(
     return gate.reason === "notFound" ? { notFound: true } : { forbidden: true };
   }
 
-  const explicitClaimantId = input.claimantId ?? gate.claimantId;
-  const claimant = await loadClaimant(explicitClaimantId ?? null);
+  // claimantId is sourced from the claim itself (never trusted from input)
+  // to prevent a caller from attaching a log — or triggering a recipient
+  // fallback — against a claimant that doesn't belong to this case.
+  const claimant = await loadClaimant(gate.claimantId ?? null);
 
   const fallback =
     input.channel === "SMS"
@@ -144,7 +146,7 @@ export async function sendOutbound(
   const contactLog = await writeContactLogWithRetry({
     claimId,
     userId: actor.userId,
-    claimantId: explicitClaimantId ?? null,
+    claimantId: gate.claimantId ?? null,
     channel,
     direction: "outbound",
     status: providerResult.status,
