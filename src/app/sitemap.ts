@@ -1,6 +1,12 @@
 import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 
+// Resolved at request time, not at build, because the DB-backed sections below
+// rely on runtime env vars (POSTGRES_URL) and would otherwise crash `next build`
+// in environments where the database isn't reachable.
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
 const BASE = 'https://surplusclickit.com';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -27,24 +33,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority,
   }));
 
-  const counties = await prisma.county.findMany({ select: { id: true, updatedAt: true } });
-  const countyPages = counties.map(c => ({
-    url: `${BASE}/county/${c.id}`,
-    lastModified: c.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
+  let countyPages: MetadataRoute.Sitemap = [];
+  let statePages: MetadataRoute.Sitemap = [];
+  try {
+    const counties = await prisma.county.findMany({ select: { id: true, updatedAt: true } });
+    countyPages = counties.map(c => ({
+      url: `${BASE}/county/${c.id}`,
+      lastModified: c.updatedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
 
-  const states = await prisma.unclaimedProperty.findMany({
-    select: { state: true },
-    distinct: ['state'],
-  });
-  const statePages = states.map(s => ({
-    url: `${BASE}/unclaimed/${s.state.toLowerCase()}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+    const states = await prisma.unclaimedProperty.findMany({
+      select: { state: true },
+      distinct: ['state'],
+    });
+    statePages = states.map(s => ({
+      url: `${BASE}/unclaimed/${s.state.toLowerCase()}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }));
+  } catch (e) {
+    // DB unavailable (build without POSTGRES_URL, outage, etc.) — fall back to
+    // the static core so crawlers still get the main site.
+    console.error('[sitemap] db unreachable, returning static-only sitemap', e);
+  }
 
   return [...staticPages, ...countyPages, ...statePages];
 }
