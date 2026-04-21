@@ -222,7 +222,7 @@ describe("sendEmail", () => {
     expect(res).toMatchObject({
       ok: false,
       error: "invalid_address",
-      providerStatus: "bounced",
+      providerStatus: "invalid_address",
     });
     expect(fetchSpy).not.toHaveBeenCalled();
   });

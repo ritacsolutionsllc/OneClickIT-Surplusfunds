@@ -57,6 +57,15 @@ export async function POST(request: NextRequest, context: RouteContext) {
     if ("forbidden" in result) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
+    if ("noClaimant" in result) {
+      return NextResponse.json(
+        {
+          error: "no_claimant",
+          message: "No claimant is linked to this case yet.",
+        },
+        { status: 400 },
+      );
+    }
     if ("missingContact" in result) {
       return NextResponse.json(
         {

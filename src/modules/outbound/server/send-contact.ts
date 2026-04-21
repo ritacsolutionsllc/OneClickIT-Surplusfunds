@@ -13,6 +13,7 @@ import { sendSms, type SendSmsResult } from "./providers/twilio";
 export type SendContactResult =
   | { notFound: true }
   | { forbidden: true }
+  | { noClaimant: true }
   | { missingContact: "phone" | "email" }
   | {
       contactLog: Extract<CreateContactLogResult, { contactLog: unknown }>["contactLog"];
@@ -42,21 +43,22 @@ export async function sendAndLogContact(
   }
 
   const claimantId = input.claimantId ?? gate.claimantId ?? null;
-  const claimant = claimantId
-    ? await prisma.claimant.findUnique({
-        where: { id: claimantId },
-        select: { id: true, phone: true, altPhone: true, email: true },
-      })
-    : null;
+  if (!claimantId) return { noClaimant: true };
+
+  const claimant = await prisma.claimant.findUnique({
+    where: { id: claimantId },
+    select: { id: true, phone: true, altPhone: true, email: true },
+  });
+  if (!claimant) return { noClaimant: true };
 
   let providerResult: SendSmsResult | SendEmailResult;
 
   if (input.channel === "SMS") {
-    const to = (claimant?.phone ?? claimant?.altPhone ?? "").trim();
+    const to = (claimant.phone ?? claimant.altPhone ?? "").trim();
     if (!to) return { missingContact: "phone" };
     providerResult = await sendSms({ to, body: input.body });
   } else {
-    const to = (claimant?.email ?? "").trim();
+    const to = (claimant.email ?? "").trim();
     if (!to) return { missingContact: "email" };
     providerResult = await sendEmail({
       to,
@@ -65,7 +67,7 @@ export async function sendAndLogContact(
     });
   }
 
-  const status = providerResult.ok ? providerResult.providerStatus : providerResult.providerStatus;
+  const status = providerResult.providerStatus;
   const notes = buildNotes(input, providerResult);
 
   const logResult = await logContact(
@@ -75,7 +77,7 @@ export async function sendAndLogContact(
       direction: "outbound",
       status,
       notes,
-      claimantId: claimant?.id ?? null,
+      claimantId: claimant.id,
       externalId: providerResult.ok ? providerResult.externalId : null,
     },
     actor,

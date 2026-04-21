@@ -64,7 +64,7 @@ export async function sendEmail(
     return {
       ok: false,
       error: "invalid_address",
-      providerStatus: "bounced",
+      providerStatus: "invalid_address",
     };
   }
 

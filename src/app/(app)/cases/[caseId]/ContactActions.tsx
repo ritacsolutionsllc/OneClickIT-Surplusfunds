@@ -108,6 +108,9 @@ export function ContactActions({ caseId }: { caseId: string }) {
       body: JSON.stringify(body),
     });
     const json = await res.json().catch(() => ({}));
+    if (res.status === 400 && json.error === "no_claimant") {
+      throw new Error(json.message ?? "No claimant is linked to this case yet.");
+    }
     if (res.status === 400 && json.error === "missing_contact") {
       throw new Error(json.message ?? "Claimant has no contact info on file.");
     }
