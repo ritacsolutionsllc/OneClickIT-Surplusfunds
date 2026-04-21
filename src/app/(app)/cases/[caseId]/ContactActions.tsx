@@ -105,7 +105,11 @@ export function ContactActions({ caseId }: { caseId: string }) {
         if (send?.status === "dry_run") {
           setToast("Logged (provider not configured — dry run)");
         } else if (send?.status === "failed") {
-          setToast("Send failed — follow-up scheduled");
+          setToast(
+            json.followUpTaskCreated
+              ? "Send failed — follow-up scheduled"
+              : "Send failed",
+          );
         } else {
           setToast(
             json.followUpTaskCreated
