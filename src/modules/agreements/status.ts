@@ -131,7 +131,7 @@ export function tokenExpiryInfo(
     return { level: "expired", daysLeft: 0, label: "This link has expired." };
   }
   const daysLeft = Math.max(1, Math.ceil(diffMs / MS_PER_DAY));
-  if (daysLeft <= 1) {
+  if (diffMs <= MS_PER_DAY) {
     return {
       level: "critical",
       daysLeft,

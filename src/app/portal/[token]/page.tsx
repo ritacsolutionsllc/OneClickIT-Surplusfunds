@@ -130,7 +130,22 @@ export default async function PortalPage({
             </div>
           ) : (
             claim.agreements.map((a) => {
-              const display = agreementPortalDisplay(a);
+              const base = agreementPortalDisplay(a);
+              // If the link itself has expired, an otherwise-signable
+              // agreement should read as closed — otherwise the copy says
+              // "type your name to sign" next to a disabled form. Keep the
+              // override local so the pure helper stays link-agnostic.
+              const display =
+                base.canSign && expiry.level === "expired"
+                  ? {
+                      ...base,
+                      tone: "closed" as const,
+                      canSign: false,
+                      label: "Link expired",
+                      message:
+                        "This link has expired. Your case agent can send a fresh link.",
+                    }
+                  : base;
               return (
                 <article
                   key={a.id}
@@ -180,7 +195,7 @@ export default async function PortalPage({
                         </>
                       ) : null}
                     </p>
-                  ) : display.canSign && expiry.level !== "expired" ? (
+                  ) : display.canSign ? (
                     <div className={`rounded-lg border p-4 ${TONE_BODY.awaiting}`}>
                       <p className="mb-3 text-sm">{display.message}</p>
                       <SignForm
