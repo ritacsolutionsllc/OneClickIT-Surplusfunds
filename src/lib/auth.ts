@@ -103,14 +103,25 @@ export const authOptions: NextAuthOptions = {
     },
     async signIn({ user }) {
       if (!user.email) return true;
+      // events.createUser handles brand-new admins. This callback only needs
+      // to retroactively elevate existing users whose ADMIN_EMAILS status
+      // changed since their last sign-in — so read the current role first
+      // and skip the write when it's already correct.
       if (ADMIN_EMAILS.includes(user.email)) {
         try {
-          await prisma.user.update({
+          const existing = await prisma.user.findUnique({
             where: { email: user.email },
-            data: { role: 'admin' },
+            select: { role: true },
           });
+          if (existing && existing.role !== 'admin') {
+            await prisma.user.update({
+              where: { email: user.email },
+              data: { role: 'admin' },
+            });
+          }
         } catch {
-          // User might not exist yet on first sign-in; adapter creates them.
+          // User might not exist yet on first OAuth sign-in; events.createUser
+          // will take it from here.
         }
       }
       return true;
