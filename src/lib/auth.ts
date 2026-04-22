@@ -116,6 +116,24 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
   },
+  events: {
+    // Runs AFTER the adapter creates a new User row. The signIn callback
+    // above runs BEFORE the adapter on OAuth first-sign-in, so it can't
+    // elevate brand-new admins. This hook closes that gap so an admin
+    // listed in ADMIN_EMAILS is admin on their very first session.
+    async createUser({ user }) {
+      if (user.email && ADMIN_EMAILS.includes(user.email)) {
+        try {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { role: 'admin' },
+          });
+        } catch (e) {
+          console.error('[auth] failed to elevate new admin', user.email, e);
+        }
+      }
+    },
+  },
   pages: {
     signIn: '/auth/signin',
     error: '/auth/signin',
