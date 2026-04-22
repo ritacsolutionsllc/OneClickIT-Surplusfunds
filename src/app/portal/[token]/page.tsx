@@ -1,9 +1,27 @@
 import { notFound } from "next/navigation";
 
 import { resolvePortalToken } from "@/modules/portal/server/tokens";
+import {
+  agreementPortalDisplay,
+  summarizePortalAgreements,
+  tokenExpiryInfo,
+  type PortalAgreementTone,
+} from "@/modules/agreements/status";
 import { SignForm } from "./SignForm";
 
 export const dynamic = "force-dynamic";
+
+const TONE_PILL: Record<PortalAgreementTone, string> = {
+  signed: "bg-emerald-100 text-emerald-700",
+  awaiting: "bg-blue-100 text-blue-700",
+  closed: "bg-zinc-100 text-zinc-600",
+};
+
+const TONE_BODY: Record<PortalAgreementTone, string> = {
+  signed: "bg-emerald-50 text-emerald-800",
+  awaiting: "bg-zinc-50 text-zinc-700",
+  closed: "bg-zinc-50 text-zinc-600",
+};
 
 /**
  * Public claimant portal. No auth — the token IS the auth.
@@ -19,6 +37,8 @@ export default async function PortalPage({
   if (!resolved) notFound();
 
   const { claim } = resolved;
+  const summary = summarizePortalAgreements(claim.agreements);
+  const expiry = tokenExpiryInfo(resolved.tokenRow.expiresAt);
   const fmt = (n: number | null | undefined) =>
     n != null
       ? n.toLocaleString("en-US", { style: "currency", currency: "USD" })
@@ -68,76 +88,132 @@ export default async function PortalPage({
           </dl>
         </header>
 
+        {summary.total > 0 && (
+          <div
+            className={`rounded-2xl border p-4 text-sm shadow-sm ${
+              summary.allSigned
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : summary.awaiting > 0
+                  ? "border-blue-200 bg-blue-50 text-blue-800"
+                  : "border-zinc-200 bg-white text-zinc-700"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium">{summary.progressLabel}</span>
+              <span className="text-xs">
+                {summary.signed}/{summary.total} complete
+              </span>
+            </div>
+          </div>
+        )}
+
+        {expiry.level !== "ok" && (
+          <div
+            className={`rounded-2xl border p-4 text-sm shadow-sm ${
+              expiry.level === "critical" || expiry.level === "expired"
+                ? "border-amber-300 bg-amber-50 text-amber-900"
+                : "border-amber-200 bg-amber-50 text-amber-800"
+            }`}
+          >
+            {expiry.label}{" "}
+            {expiry.level !== "expired" &&
+              "Contact your case agent if you need more time."}
+          </div>
+        )}
+
         <section className="space-y-4">
           <h2 className="text-lg font-semibold">Agreements</h2>
           {claim.agreements.length === 0 ? (
             <div className="rounded-2xl border bg-white p-6 text-sm text-zinc-500 shadow-sm">
-              No agreements have been shared yet.
+              No agreements have been shared yet. Your case agent will send
+              them here when they&rsquo;re ready.
             </div>
           ) : (
-            claim.agreements.map((a) => (
-              <article
-                key={a.id}
-                className="rounded-2xl border bg-white p-6 shadow-sm space-y-4"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="text-base font-semibold">
-                      {a.type.replaceAll("_", " ")}
-                    </h3>
-                    <p className="text-xs text-zinc-500">
-                      Sent{" "}
-                      {a.sentAt
-                        ? new Date(a.sentAt).toLocaleDateString()
-                        : new Date(a.createdAt).toLocaleDateString()}
-                      {a.feePercent != null ? ` · Fee ${a.feePercent}%` : ""}
+            claim.agreements.map((a) => {
+              const base = agreementPortalDisplay(a);
+              // If the link itself has expired, an otherwise-signable
+              // agreement should read as closed — otherwise the copy says
+              // "type your name to sign" next to a disabled form. Keep the
+              // override local so the pure helper stays link-agnostic.
+              const display =
+                base.canSign && expiry.level === "expired"
+                  ? {
+                      ...base,
+                      tone: "closed" as const,
+                      canSign: false,
+                      label: "Link expired",
+                      message:
+                        "This link has expired. Your case agent can send a fresh link.",
+                    }
+                  : base;
+              return (
+                <article
+                  key={a.id}
+                  className="rounded-2xl border bg-white p-6 shadow-sm space-y-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-base font-semibold">
+                        {a.type.replaceAll("_", " ")}
+                      </h3>
+                      <p className="text-xs text-zinc-500">
+                        Sent{" "}
+                        {a.sentAt
+                          ? new Date(a.sentAt).toLocaleDateString()
+                          : new Date(a.createdAt).toLocaleDateString()}
+                        {a.feePercent != null ? ` · Fee ${a.feePercent}%` : ""}
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${TONE_PILL[display.tone]}`}
+                    >
+                      {display.label}
+                    </span>
+                  </div>
+
+                  <details className="text-sm">
+                    <summary className="cursor-pointer text-blue-700 hover:underline">
+                      View full document
+                    </summary>
+                    <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border bg-zinc-50 p-3 text-xs font-mono">
+                      {a.renderedText ?? "(no text)"}
+                    </pre>
+                  </details>
+
+                  {display.tone === "signed" ? (
+                    <p
+                      className={`rounded-lg px-4 py-3 text-sm ${TONE_BODY.signed}`}
+                    >
+                      {display.message}
+                      {a.signedAt ? (
+                        <>
+                          {" "}
+                          <span className="text-xs opacity-80">
+                            Signed{" "}
+                            {new Date(a.signedAt).toLocaleString()}
+                          </span>
+                        </>
+                      ) : null}
                     </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      a.status === "SIGNED"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : a.status === "SENT" || a.status === "VIEWED"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-zinc-100 text-zinc-700"
-                    }`}
-                  >
-                    {a.status}
-                  </span>
-                </div>
-
-                <details className="text-sm">
-                  <summary className="cursor-pointer text-blue-700 hover:underline">
-                    View full document
-                  </summary>
-                  <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border bg-zinc-50 p-3 text-xs font-mono">
-                    {a.renderedText ?? "(no text)"}
-                  </pre>
-                </details>
-
-                {a.status === "SIGNED" ? (
-                  <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                    Signed{" "}
-                    {a.signedAt
-                      ? new Date(a.signedAt).toLocaleString()
-                      : "successfully"}
-                    . A copy has been saved to the case file.
-                  </p>
-                ) : a.status === "SENT" || a.status === "VIEWED" ? (
-                  <div className="rounded-lg border bg-zinc-50 p-4">
-                    <SignForm
-                      token={token}
-                      agreementId={a.id}
-                      defaultName={claim.claimant?.fullName ?? claim.ownerName}
-                    />
-                  </div>
-                ) : (
-                  <p className="text-xs text-zinc-500">
-                    This agreement is not currently available for signing.
-                  </p>
-                )}
-              </article>
-            ))
+                  ) : display.canSign ? (
+                    <div className={`rounded-lg border p-4 ${TONE_BODY.awaiting}`}>
+                      <p className="mb-3 text-sm">{display.message}</p>
+                      <SignForm
+                        token={token}
+                        agreementId={a.id}
+                        defaultName={claim.claimant?.fullName ?? claim.ownerName}
+                      />
+                    </div>
+                  ) : (
+                    <p
+                      className={`rounded-lg px-4 py-3 text-sm ${TONE_BODY.closed}`}
+                    >
+                      {display.message}
+                    </p>
+                  )}
+                </article>
+              );
+            })
           )}
         </section>
 

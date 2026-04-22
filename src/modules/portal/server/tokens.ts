@@ -8,6 +8,9 @@ const portalClaimInclude = {
     select: { id: true, fullName: true, email: true, phone: true },
   },
   agreements: {
+    // Claimants only see agreements that have been released to them. DRAFT is
+    // operator-only — leaking half-baked docs is a trust risk.
+    where: { status: { not: "DRAFT" } },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
