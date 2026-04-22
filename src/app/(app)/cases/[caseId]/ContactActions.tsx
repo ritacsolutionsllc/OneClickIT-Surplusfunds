@@ -25,16 +25,35 @@ type Direction = "outbound" | "inbound";
  * failed attempt), we surface that as a toast so operators know without
  * needing to scan the task list.
  */
-export function ContactActions({ caseId }: { caseId: string }) {
+type SmsCapability = {
+  enabled: boolean;
+  testMode: boolean;
+  claimantPhone: string | null;
+};
+
+export function ContactActions({
+  caseId,
+  sms,
+}: {
+  caseId: string;
+  sms?: SmsCapability;
+}) {
   const router = useRouter();
   const [channel, setChannel] = useState<Channel>("CALL");
   const [direction, setDirection] = useState<Direction>("outbound");
   const [status, setStatus] = useState("");
   const [duration, setDuration] = useState("");
   const [notes, setNotes] = useState("");
+  const [smsBody, setSmsBody] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  const canSendSms =
+    channel === "SMS" &&
+    direction === "outbound" &&
+    sms?.enabled === true &&
+    Boolean(sms.claimantPhone);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +88,47 @@ export function ContactActions({ caseId }: { caseId: string }) {
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "log failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function sendSms() {
+    if (!smsBody.trim()) {
+      setError("Enter a message to send");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    setToast(null);
+    try {
+      const res = await fetch(`/api/v1/cases/${caseId}/send-sms`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: smsBody.trim() }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.success) {
+        setSmsBody("");
+        setToast(
+          json.testMode
+            ? `SMS queued in test mode (sid ${json.sid})`
+            : `SMS sent (sid ${json.sid})`,
+        );
+        router.refresh();
+        return;
+      }
+      const msg =
+        json.error ??
+        (json.success === false ? "Twilio rejected the send" : "send failed");
+      if (json.contactLogId) {
+        setError(`${msg}. Attempt logged${json.followUpTaskCreated ? "; follow-up scheduled" : ""}.`);
+        router.refresh();
+      } else {
+        setError(msg);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "send failed");
     } finally {
       setBusy(false);
     }
@@ -173,6 +233,46 @@ export function ContactActions({ caseId }: { caseId: string }) {
           placeholder="What happened? Next step?"
         />
       </label>
+
+      {channel === "SMS" && direction === "outbound" && sms?.enabled && (
+        <div className="rounded-lg border border-sky-200 bg-sky-50/50 p-2">
+          <div className="flex items-center justify-between text-[11px] text-sky-800">
+            <span>
+              Send via Twilio
+              {sms.claimantPhone ? ` → ${sms.claimantPhone}` : " (no phone on file)"}
+            </span>
+            {sms.testMode && (
+              <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] font-medium text-amber-900">
+                TEST MODE
+              </span>
+            )}
+          </div>
+          <textarea
+            value={smsBody}
+            onChange={(e) => setSmsBody(e.target.value)}
+            rows={3}
+            maxLength={1600}
+            placeholder="Message body…"
+            className="mt-2 w-full rounded-lg border px-2 py-1.5 text-sm"
+          />
+          <div className="mt-1 flex items-center justify-between">
+            <span className="text-[10px] text-zinc-500">{smsBody.length}/1600</span>
+            <button
+              type="button"
+              onClick={sendSms}
+              disabled={busy || !canSendSms || !smsBody.trim()}
+              className="rounded-lg bg-sky-600 px-3 py-1 text-xs text-white disabled:opacity-50"
+            >
+              {busy ? "Sending…" : "Send SMS"}
+            </button>
+          </div>
+          {!canSendSms && !sms.claimantPhone && (
+            <p className="mt-1 text-[10px] text-amber-700">
+              Add a phone number to the claimant to enable send.
+            </p>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-red-200 bg-red-50 p-2 text-xs text-red-700">

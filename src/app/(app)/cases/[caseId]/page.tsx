@@ -6,6 +6,7 @@ import {
   getCaseById,
   getCaseTimeline,
 } from "@/modules/cases/server/service";
+import { readTwilioConfig } from "@/modules/outbound/server/twilio-sms";
 import { StatusUpdater } from "./StatusUpdater";
 import { PortalLinkAction } from "./PortalLinkAction";
 import { ContactActions } from "./ContactActions";
@@ -31,6 +32,13 @@ export default async function CaseDetailPage({
 
   if (!detail) notFound();
   const timeline = timelineResult?.timeline ?? [];
+
+  const twilio = readTwilioConfig();
+  const smsCapability = {
+    enabled: Boolean(twilio),
+    testMode: twilio?.testMode ?? false,
+    claimantPhone: detail.claimant?.phone ?? detail.claimant?.altPhone ?? null,
+  };
 
   return (
     <main className="p-6 space-y-6">
@@ -160,7 +168,7 @@ export default async function CaseDetailPage({
           <div className="rounded-2xl border bg-white p-4 shadow-sm">
             <h2 className="text-lg font-semibold">Log contact</h2>
             <div className="mt-4">
-              <ContactActions caseId={detail.id} />
+              <ContactActions caseId={detail.id} sms={smsCapability} />
             </div>
           </div>
 

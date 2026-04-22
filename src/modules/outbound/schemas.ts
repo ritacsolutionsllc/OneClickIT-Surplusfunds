@@ -31,3 +31,10 @@ export const updateContactLogSchema = z.object({
 
 export type CreateContactLogInput = z.infer<typeof createContactLogSchema>;
 export type UpdateContactLogInput = z.infer<typeof updateContactLogSchema>;
+
+export const sendSmsSchema = z.object({
+  message: z.string().trim().min(1).max(1600),
+  to: z.preprocess(emptyToUndefined, z.string().max(32).optional()).optional(),
+  claimantId: z.string().cuid().optional().nullable(),
+});
+export type SendSmsInput = z.infer<typeof sendSmsSchema>;
