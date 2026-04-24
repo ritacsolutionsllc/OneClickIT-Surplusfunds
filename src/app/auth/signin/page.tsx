@@ -9,14 +9,25 @@ export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    await signIn('email', { email, callbackUrl: '/dashboard', redirect: false });
-    setSubmitted(true);
-    setLoading(false);
+    setError('');
+    try {
+      const result = await signIn('email', { email, callbackUrl: '/dashboard', redirect: false });
+      if (result?.error) {
+        setError('Failed to send magic link. Please try again.');
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -64,6 +75,9 @@ export default function SignInPage() {
             <Button type="submit" className="w-full" variant="primary" disabled={loading}>
               {loading ? 'Sending link…' : 'Send magic link'}
             </Button>
+            {error && (
+              <p className="text-sm text-red-600 text-center">{error}</p>
+            )}
           </form>
         )}
 

@@ -4,18 +4,30 @@ import EmailProvider from 'next-auth/providers/email';
 import { prisma } from './prisma';
 import { ADMIN_EMAILS } from './constants';
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
-  providers: [
-    EmailProvider({
-      server: process.env.EMAIL_SERVER ?? {
+const emailServer = process.env.EMAIL_SERVER ?? (
+  process.env.EMAIL_SERVER_HOST
+    ? {
         host: process.env.EMAIL_SERVER_HOST,
         port: Number(process.env.EMAIL_SERVER_PORT ?? 465),
         auth: {
           user: process.env.EMAIL_SERVER_USER,
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
-      },
+      }
+    : undefined
+);
+
+if (!emailServer && process.env.NODE_ENV !== 'production') {
+  console.warn(
+    '[auth] EMAIL_SERVER or EMAIL_SERVER_HOST is not set — magic link sign-in will not work.'
+  );
+}
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
+  providers: [
+    EmailProvider({
+      server: emailServer,
       from: process.env.EMAIL_FROM,
     }),
   ],
