@@ -6,32 +6,34 @@ type Props = {
 };
 
 /**
- * Validates that the callback URL is same-origin and targets the
- * NextAuth email callback endpoint. Prevents open-redirect phishing
- * where an attacker stuffs an arbitrary URL into the ?url= param.
+ * Parses the raw callback URL, validates it targets the NextAuth email
+ * callback with the required params, then appends ?_v=1 so middleware
+ * lets the request through without another redirect.
+ *
+ * Returns null for anything that doesn’t look like a legitimate NextAuth
+ * email-callback URL, preventing open-redirect phishing.
  */
-function isValidCallbackUrl(raw: string): boolean {
-  if (!raw) return false;
+function buildSignInUrl(rawUrl: string): string | null {
+  if (!rawUrl) return null;
   try {
-    const parsed = new URL(raw);
-    const appUrl = process.env.NEXTAUTH_URL;
-    if (appUrl) {
-      const appOrigin = new URL(appUrl).origin;
-      if (parsed.origin !== appOrigin) return false;
+    const parsed = new URL(rawUrl);
+    if (
+      parsed.pathname !== '/api/auth/callback/email' ||
+      !parsed.searchParams.get('token') ||
+      !parsed.searchParams.get('email')
+    ) {
+      return null;
     }
-    return (
-      parsed.pathname === '/api/auth/callback/email' &&
-      !!parsed.searchParams.get('token') &&
-      !!parsed.searchParams.get('email')
-    );
+    parsed.searchParams.set('_v', '1');
+    return parsed.toString();
   } catch {
-    return false;
+    return null;
   }
 }
 
 export default async function VerifyPage({ searchParams }: Props) {
   const { url: rawUrl = '' } = await searchParams;
-  const valid = isValidCallbackUrl(rawUrl);
+  const signInUrl = buildSignInUrl(rawUrl);
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
@@ -46,7 +48,7 @@ export default async function VerifyPage({ searchParams }: Props) {
           />
         </div>
 
-        {valid ? (
+        {signInUrl ? (
           <>
             <h1 className="text-2xl font-bold text-gray-900">One tap to sign in</h1>
             <p className="mt-2 text-sm text-gray-500">
@@ -54,7 +56,7 @@ export default async function VerifyPage({ searchParams }: Props) {
             </p>
             <div className="mt-8">
               <a
-                href={rawUrl}
+                href={signInUrl}
                 className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Sign in to SurplusClickIT
