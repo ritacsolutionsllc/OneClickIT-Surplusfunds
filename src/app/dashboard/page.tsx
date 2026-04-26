@@ -4,7 +4,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import { Bell, Bookmark, MapPin, Search, Download, Shield, CreditCard, ArrowRight, Wrench, Globe, FileText, Calculator, ClipboardList, FileDown } from 'lucide-react';
+import {
+  Bell, Bookmark, MapPin, Search, Download, Shield,
+  CreditCard, ArrowRight, Wrench, Globe, FileText,
+  Calculator, ClipboardList, FileDown, Settings, User,
+  BarChart2, Database, Key
+} from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 
@@ -15,7 +20,7 @@ export default async function DashboardPage() {
   let stats = 0;
   try { stats = await prisma.county.count(); } catch { /* db unavailable */ }
 
-  // Authenticated dashboard
+  // ── Authenticated dashboard ────────────────────────────────────────────────
   if (session) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let alerts: any[] = [];
@@ -28,10 +33,12 @@ export default async function DashboardPage() {
     } catch { /* db unavailable */ }
 
     const isPro = session.user.role === 'pro' || session.user.role === 'admin';
+    const isAdmin = session.user.role === 'admin';
     const firstName = session.user.name?.split(' ')[0] || session.user.email?.split('@')[0] || 'there';
 
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Welcome back, {firstName}</h1>
           <p className="text-sm text-gray-500">
@@ -40,9 +47,31 @@ export default async function DashboardPage() {
                 <Badge variant="success">Pro</Badge> Full access to all features
               </span>
             ) : (
-              <span>Free plan &mdash; <Link href="/pricing" className="text-blue-600 hover:underline">upgrade to Pro</Link> for CSV exports</span>
+              <span>Free plan &mdash; <Link href="/pricing" className="text-blue-600 hover:underline">upgrade to Pro</Link> for CSV exports &amp; advanced features</span>
             )}
           </p>
+        </div>
+
+        {/* Stats overview */}
+        <div className="mb-8 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+              <Database className="h-3.5 w-3.5" /> Counties Available
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{stats.toLocaleString()}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+              <Bell className="h-3.5 w-3.5" /> Active Alerts
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{alerts.length}</div>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+              <BarChart2 className="h-3.5 w-3.5" /> Account Status
+            </div>
+            <div className="text-lg font-bold text-gray-900 capitalize">{session.user.role ?? 'free'}</div>
+          </div>
         </div>
 
         {/* Quick start */}
@@ -75,8 +104,9 @@ export default async function DashboardPage() {
             <ArrowRight className="ml-auto h-4 w-4 text-gray-300 group-hover:text-purple-500" />
           </Link>
 
+          {/* Export — always enabled for authenticated users */}
           <Link
-            href={isPro ? '/export' : '/pricing'}
+            href="/export"
             className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:border-green-300 hover:shadow-md transition-all"
           >
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 group-hover:bg-green-200">
@@ -84,7 +114,7 @@ export default async function DashboardPage() {
             </div>
             <div>
               <div className="font-medium text-gray-900">Export Data</div>
-              <div className="text-xs text-gray-500">{isPro ? 'Download CSV files' : 'Pro feature'}</div>
+              <div className="text-xs text-gray-500">Download CSV files</div>
             </div>
             <ArrowRight className="ml-auto h-4 w-4 text-gray-300 group-hover:text-green-500" />
           </Link>
@@ -158,12 +188,54 @@ export default async function DashboardPage() {
               )}
             </div>
           </Card>
+
+          {/* Settings panel — always unlocked post-login */}
+          <Card>
+            <h2 className="mb-4 font-semibold text-gray-900 flex items-center gap-2">
+              <Settings className="h-4 w-4 text-blue-600" /> Account Settings
+            </h2>
+            <div className="space-y-1">
+              <Link href="/settings" className="flex items-center gap-2 rounded-lg p-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <User className="h-4 w-4 text-gray-400" /> Profile &amp; Preferences
+              </Link>
+              <Link href="/settings/notifications" className="flex items-center gap-2 rounded-lg p-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <Bell className="h-4 w-4 text-gray-400" /> Notification Settings
+              </Link>
+              <Link href="/settings/api" className="flex items-center gap-2 rounded-lg p-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <Key className="h-4 w-4 text-gray-400" /> API Keys
+              </Link>
+              <Link href="/settings/billing" className="flex items-center gap-2 rounded-lg p-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <CreditCard className="h-4 w-4 text-gray-400" /> Billing &amp; Plan
+              </Link>
+              {isAdmin && (
+                <Link href="/admin" className="flex items-center gap-2 rounded-lg p-2.5 text-sm text-red-600 hover:bg-red-50 font-medium">
+                  <Shield className="h-4 w-4" /> Admin Panel
+                </Link>
+              )}
+            </div>
+          </Card>
+
+          {/* Pro upgrade CTA — only for free users */}
+          {!isPro && (
+            <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+              <h2 className="mb-2 text-lg font-bold">Unlock Pro Features</h2>
+              <p className="mb-4 text-sm text-blue-100">
+                Get CSV exports, bulk data access, priority support, and advanced OSINT tools.
+              </p>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-md hover:bg-blue-50 transition-colors"
+              >
+                View Plans <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 
-  // Public dashboard (not signed in)
+  // ── Public dashboard (not signed in) ──────────────────────────────────────
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
