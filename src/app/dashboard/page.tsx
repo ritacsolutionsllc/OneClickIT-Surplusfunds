@@ -7,6 +7,10 @@ import Link from 'next/link';
 import { Bell, Bookmark, MapPin, Search, Download, Shield, CreditCard, ArrowRight, Wrench, Globe, FileText, Calculator, ClipboardList, FileDown } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { CountiesByStateChart } from '@/components/charts/CountiesByStateChart';
+import { AlertsOverTimeChart } from '@/components/charts/AlertsOverTimeChart';
+import { getCountiesByState } from '@/lib/hooks/useCountiesByState';
+import { getAlertsOverTime } from '@/lib/hooks/useAlertsOverTime';
 
 export default async function DashboardPage() {
   let session = null;
@@ -88,6 +92,16 @@ export default async function DashboardPage() {
             </div>
             <ArrowRight className="ml-auto h-4 w-4 text-gray-300 group-hover:text-green-500" />
           </Link>
+        </div>
+
+        {/* Charts row */}
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" style={{ height: 320 }}>
+            <CountiesByStateChart data={await getCountiesByState()} />
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm" style={{ height: 320 }}>
+            <AlertsOverTimeChart data={await getAlertsOverTime()} />
+          </div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2">

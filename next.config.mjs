@@ -2,13 +2,14 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['@visactor/vchart', '@visactor/react-vchart'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
   // Allow Puppeteer/Chromium to be bundled correctly
-  serverExternalPackages: ['puppeteer-core', '@sparticuz/chromium'],
+  serverExternalPackages: ['puppeteer-core', '@sparticuz/chromium', 'nodemailer'],
   async headers() {
     return [
       {
