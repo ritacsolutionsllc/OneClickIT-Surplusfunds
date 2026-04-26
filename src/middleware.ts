@@ -22,6 +22,12 @@ export const config = {
     '/insights/:path*',
     '/osint/:path*',
     '/dorks/:path*',
+    // Settings — all sub-routes protected but always accessible post-login
     '/settings/:path*',
+    '/settings/notifications/:path*',
+    '/settings/billing/:path*',
+    '/settings/api/:path*',
+    // Portal
+    '/portal/:path*',
   ],
 };
