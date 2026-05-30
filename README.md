@@ -1,78 +1,83 @@
-# OneClickIT Surplus Funds
+# OneClickSurplusFunds
 
-A Next.js application for surplus funds research and claims management, built by OneClickIT.
+> Professional surplus funds recovery platform. 50 states covered.
 
-## Features
+**Live URL:** https://oneclicksurplusfunds.base44.app  
+**Pricing:** Free (3 claims) / Starter $29/mo / Pro $99/mo / Agency $249/mo  
+**Enforcement Gates:** 1/6 passing  
+**Current Status:** 🔴 40+ routes exposed. App description is boilerplate. /Sign route needs deletion.
 
-- Surplus funds search and tracking
-- Claims management dashboard
-- Stripe payment integration
-- Admin panel with protected routes
-- PDF export and reporting
+---
 
-## Getting Started
+## Implementation Priority: #12 / 13
 
-### Prerequisites
+## Enforcement Gate Checklist
 
-- Node.js 18+
-- PostgreSQL database
-- Stripe account
-- Vercel account (for deployment)
+| Gate | Status |
+|------|--------|
+| Routing (Public/Protected/Admin classification) | ✅ |
+| Auth (Login + Signup pages) | ❌ |
+| Pricing (/pricing page with Stripe CTAs) | ❌ |
+| Entitlements (PlanGate on premium features) | ❌ |
+| Stripe Webhook | ✅ Registered May 29 2026 |
+| Admin Safety (AuthGuard adminOnly) | ❌ |
 
-### Setup
+---
 
-1. Clone the repository and install dependencies:
+## Protected Routes
 
-```bash
-npm install
-```
+- `40+ routes — see implementation guide`
 
-2. Copy the environment variables template and fill in your values:
+## Plan Gates
 
-```bash
-cp .env.example .env.local
-```
+- `/enrichment (pro)`
+- `/osint (pro)`
+- `/pro (agency)`
+- `/marketplace (agency)`
 
-3. Push the database schema:
+---
 
-```bash
-npm run db:push
-```
+## Backend Functions (all live)
 
-4. (Optional) Seed the database:
+| Function | Endpoint |
+|----------|----------|
+| Stripe Checkout | `POST https://superagent-b2d614b7.base44.app/functions/createStripeCheckout` |
+| Billing Portal | `POST https://superagent-b2d614b7.base44.app/functions/createBillingPortal` |
+| Usage Gate | `POST https://superagent-b2d614b7.base44.app/functions/checkUsageGate` |
+| Export Gate | `POST https://superagent-b2d614b7.base44.app/functions/exportGate` |
+| Audit Logger | `POST https://superagent-b2d614b7.base44.app/functions/auditLogger` |
 
-```bash
-npm run db:seed
-```
+---
 
-5. Run the development server:
+## Universal Components Required
 
-```bash
-npm run dev
-```
+- `AuthGuard.jsx` — wraps all protected routes
+- `PlanGate.jsx` — wraps premium features with upgrade prompt
+- `BillingPortalButton.jsx` — opens Stripe customer self-serve portal
 
-Open [http://localhost:3000](http://localhost:3000) to view the app.
+---
 
-## Environment Variables
+## QA Checklist
 
-See `.env.example` for a full list of required environment variables. Key variables include:
+- [ ] Logged-out users cannot access protected routes (test in incognito)
+- [ ] /login and /signup are separate with correct redirect behavior
+- [ ] Public homepage shows marketing content — not dashboard UI
+- [ ] /pricing page exists and is publicly accessible
+- [ ] Pricing CTAs trigger createStripeCheckout correctly
+- [ ] Premium features show upgrade prompt to free users
+- [ ] Premium features blocked at logic layer (not just UI)
+- [ ] Admin routes return 403 for non-admin authenticated users
+- [ ] BillingPortalButton opens Stripe customer portal
+- [ ] No demo/test data visible to real users
+- [ ] Mobile layout (375px) — no overflow or broken elements
 
-- `DATABASE_URL` — PostgreSQL connection string
-- `NEXTAUTH_SECRET` — Secret for NextAuth session encryption
-- `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` — Stripe credentials
+---
 
-## Scripts
+## Related Apps (Cross-sell)
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Start production server |
-| `npm run db:push` | Push Prisma schema to database |
-| `npm run db:seed` | Seed the database |
-| `npm run db:studio` | Open Prisma Studio |
-| `npm run test` | Run Playwright e2e tests |
+All 13 apps: https://oneclickitonboarding.base44.app  
+Book a demo: https://calendly.com/oneclickitllc
 
-## Deployment
+---
 
-Deploy on [Vercel](https://vercel.com). Set all environment variables in the Vercel dashboard before deploying.
+*Managed by RITAC Solutions · RITAC Command AI Agent · May 2026*
